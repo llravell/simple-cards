@@ -8,25 +8,23 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type HealthUseCase interface {
+type healthUseCase interface {
 	PingContext(ctx context.Context) error
 }
 
-type healthRoutes struct {
-	healthUC HealthUseCase
+type HealthRoutes struct {
+	healthUC healthUseCase
 	log      zerolog.Logger
 }
 
-func NewHealthRoutes(r chi.Router, healthUC HealthUseCase, log zerolog.Logger) {
-	routes := &healthRoutes{
+func NewHealthRoutes(healthUC healthUseCase, log zerolog.Logger) *HealthRoutes {
+	return &HealthRoutes{
 		healthUC: healthUC,
 		log:      log,
 	}
-
-	r.Get("/ping", routes.ping)
 }
 
-func (hr *healthRoutes) ping(w http.ResponseWriter, r *http.Request) {
+func (hr *HealthRoutes) ping(w http.ResponseWriter, r *http.Request) {
 	err := hr.healthUC.PingContext(r.Context())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -35,4 +33,8 @@ func (hr *healthRoutes) ping(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func (routes *HealthRoutes) Apply(r chi.Router) {
+	r.Get("/ping", routes.ping)
 }

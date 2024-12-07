@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"flag"
 
 	"github.com/caarlos0/env"
@@ -11,6 +12,8 @@ const (
 	_defaultDatabaseURI = ""
 	_defaultJWTSecret   = "secret"
 )
+
+var ErrEmptyDatabaseURI = errors.New("got empty database uri")
 
 type Config struct {
 	Addr        string `env:"RUN_ADDRESS"`
@@ -34,5 +37,13 @@ func NewConfig() (*Config, error) {
 	flag.StringVar(&cfg.DatabaseURI, "d", cfg.DatabaseURI, "Base address for redirect as host:port")
 	flag.Parse()
 
-	return cfg, nil
+	return cfg, cfg.Validate()
+}
+
+func (c *Config) Validate() error {
+	if c.DatabaseURI == "" {
+		return ErrEmptyDatabaseURI
+	}
+
+	return nil
 }
