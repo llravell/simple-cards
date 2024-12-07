@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/llravell/simple-cards/internal/controller/http/middleware"
 	"github.com/llravell/simple-cards/internal/entity"
 	"github.com/rs/zerolog"
 )
@@ -17,16 +18,10 @@ type authUseCase interface {
 	RegisterUser(ctx context.Context, login string, password string) (*entity.User, error)
 }
 
-type (
-	authRequest struct {
-		Login    string `json:"login"`
-		Password string `json:"password"`
-	}
-
-	authResponse struct {
-		Token string `json:"token"`
-	}
-)
+type authRequest struct {
+	Login    string `json:"login"`
+	Password string `json:"password"`
+}
 
 type AuthRoutes struct {
 	authUC authUseCase
@@ -70,10 +65,12 @@ func (routes *AuthRoutes) register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(authResponse{Token: token})
-	if err != nil {
-		routes.log.Err(err).Msg("response writing failed")
-	}
+	http.SetCookie(w, &http.Cookie{
+		Name:     middleware.TokenCookieName,
+		MaxAge:   int(entity.JWTExpire.Seconds()),
+		HttpOnly: true,
+		Value:    token,
+	})
 }
 
 func (routes *AuthRoutes) login(w http.ResponseWriter, r *http.Request) {
@@ -101,10 +98,12 @@ func (routes *AuthRoutes) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(authResponse{Token: token})
-	if err != nil {
-		routes.log.Err(err).Msg("response writing failed")
-	}
+	http.SetCookie(w, &http.Cookie{
+		Name:     middleware.TokenCookieName,
+		MaxAge:   int(entity.JWTExpire.Seconds()),
+		HttpOnly: true,
+		Value:    token,
+	})
 }
 
 func (routes *AuthRoutes) Apply(r chi.Router) {
