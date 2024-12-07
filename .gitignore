@@ -17,6 +17,7 @@
 # Binaries
 cmd/gophermart/main
 cmd/gophermart/gophermart
+bin
 
 # Dependency directories (remove the comment below to include it)
 vendor/

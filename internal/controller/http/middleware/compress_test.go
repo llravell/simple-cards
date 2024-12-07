@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	testutils "github.com/llravell/simple-cards/internal"
-	"github.com/llravell/simple-cards/internal/infrastructure/http/middleware"
+	"github.com/llravell/simple-cards/internal/controller/http/middleware"
 	"github.com/stretchr/testify/assert"
 )
 
