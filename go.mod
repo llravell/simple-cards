@@ -21,6 +21,8 @@ require (
 )
 
 require (
+	github.com/golang-jwt/jwt/v4 v4.5.1
+	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect

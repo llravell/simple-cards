@@ -24,21 +24,6 @@ func echoHandler(t *testing.T) http.HandlerFunc {
 	})
 }
 
-func compressReader(t *testing.T, data string) io.Reader {
-	t.Helper()
-
-	var buf bytes.Buffer
-
-	wr := gzip.NewWriter(&buf)
-	_, err := wr.Write([]byte(data))
-	require.NoError(t, err)
-
-	err = wr.Close()
-	require.NoError(t, err)
-
-	return &buf
-}
-
 func decompress(t *testing.T, data []byte) string {
 	t.Helper()
 

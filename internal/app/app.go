@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/llravell/simple-cards/internal/controller/http/auth"
 	"github.com/llravell/simple-cards/internal/controller/http/health"
 	"github.com/llravell/simple-cards/internal/controller/http/middleware"
 	"github.com/llravell/simple-cards/internal/usecase"
@@ -29,6 +30,7 @@ type Option func(app *App)
 
 type App struct {
 	healthUseCase *usecase.HealthUseCase
+	authUseCase   *usecase.AuthUseCase
 	router        chi.Router
 	log           zerolog.Logger
 	addr          string
@@ -49,11 +51,13 @@ func JWTSecret(secret string) Option {
 
 func New(
 	healthUseCase *usecase.HealthUseCase,
+	authUseCase *usecase.AuthUseCase,
 	log zerolog.Logger,
 	opts ...Option,
 ) *App {
 	app := &App{
 		healthUseCase: healthUseCase,
+		authUseCase:   authUseCase,
 		log:           log,
 		router:        chi.NewRouter(),
 	}
@@ -67,9 +71,11 @@ func New(
 
 func (app *App) Run() {
 	healthRoutes := health.NewHealthRoutes(app.healthUseCase, app.log)
+	authRoutes := auth.NewAuthRoutes(app.authUseCase, app.log)
 
 	app.router.Use(middleware.LoggerMiddleware(app.log))
 	healthRoutes.Apply(app.router)
+	authRoutes.Apply(app.router)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
