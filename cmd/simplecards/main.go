@@ -10,6 +10,7 @@ import (
 	"github.com/llravell/simple-cards/internal/repository"
 	"github.com/llravell/simple-cards/internal/usecase"
 	"github.com/llravell/simple-cards/logger"
+	"github.com/llravell/simple-cards/pkg/auth"
 )
 
 func main() {
@@ -31,8 +32,9 @@ func main() {
 	log := logger.Get()
 
 	usersRepository := repository.NewUsersRepository(db)
+	jwtManager := auth.NewJWTManager(cfg.JWTSecret)
 	healthUseCase := usecase.NewHealthUseCase(db)
-	authUseCase := usecase.NewAuthUseCase(usersRepository, cfg.JWTSecret)
+	authUseCase := usecase.NewAuthUseCase(usersRepository, jwtManager)
 
 	app.New(
 		healthUseCase,

@@ -70,8 +70,8 @@ func New(
 }
 
 func (app *App) Run() {
-	healthRoutes := health.NewHealthRoutes(app.healthUseCase, app.log)
-	authRoutes := auth.NewAuthRoutes(app.authUseCase, app.log)
+	healthRoutes := health.NewRoutes(app.healthUseCase, app.log)
+	authRoutes := auth.NewRoutes(app.authUseCase, app.log)
 
 	app.router.Use(middleware.LoggerMiddleware(app.log))
 	healthRoutes.Apply(app.router)

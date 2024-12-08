@@ -12,7 +12,9 @@ package mocks
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
+	entity "github.com/llravell/simple-cards/internal/entity"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -52,4 +54,97 @@ func (m *MockHealthRepository) PingContext(ctx context.Context) error {
 func (mr *MockHealthRepositoryMockRecorder) PingContext(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PingContext", reflect.TypeOf((*MockHealthRepository)(nil).PingContext), ctx)
+}
+
+// MockUserRepository is a mock of UserRepository interface.
+type MockUserRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockUserRepositoryMockRecorder
+	isgomock struct{}
+}
+
+// MockUserRepositoryMockRecorder is the mock recorder for MockUserRepository.
+type MockUserRepositoryMockRecorder struct {
+	mock *MockUserRepository
+}
+
+// NewMockUserRepository creates a new mock instance.
+func NewMockUserRepository(ctrl *gomock.Controller) *MockUserRepository {
+	mock := &MockUserRepository{ctrl: ctrl}
+	mock.recorder = &MockUserRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockUserRepository) EXPECT() *MockUserRepositoryMockRecorder {
+	return m.recorder
+}
+
+// FindUserByLogin mocks base method.
+func (m *MockUserRepository) FindUserByLogin(ctx context.Context, login string) (*entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindUserByLogin", ctx, login)
+	ret0, _ := ret[0].(*entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindUserByLogin indicates an expected call of FindUserByLogin.
+func (mr *MockUserRepositoryMockRecorder) FindUserByLogin(ctx, login any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindUserByLogin", reflect.TypeOf((*MockUserRepository)(nil).FindUserByLogin), ctx, login)
+}
+
+// StoreUser mocks base method.
+func (m *MockUserRepository) StoreUser(ctx context.Context, login, password string) (*entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StoreUser", ctx, login, password)
+	ret0, _ := ret[0].(*entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// StoreUser indicates an expected call of StoreUser.
+func (mr *MockUserRepositoryMockRecorder) StoreUser(ctx, login, password any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreUser", reflect.TypeOf((*MockUserRepository)(nil).StoreUser), ctx, login, password)
+}
+
+// MockJWTIssuer is a mock of JWTIssuer interface.
+type MockJWTIssuer struct {
+	ctrl     *gomock.Controller
+	recorder *MockJWTIssuerMockRecorder
+	isgomock struct{}
+}
+
+// MockJWTIssuerMockRecorder is the mock recorder for MockJWTIssuer.
+type MockJWTIssuerMockRecorder struct {
+	mock *MockJWTIssuer
+}
+
+// NewMockJWTIssuer creates a new mock instance.
+func NewMockJWTIssuer(ctrl *gomock.Controller) *MockJWTIssuer {
+	mock := &MockJWTIssuer{ctrl: ctrl}
+	mock.recorder = &MockJWTIssuerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockJWTIssuer) EXPECT() *MockJWTIssuerMockRecorder {
+	return m.recorder
+}
+
+// Issue mocks base method.
+func (m *MockJWTIssuer) Issue(userUUID string, ttl time.Duration) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Issue", userUUID, ttl)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Issue indicates an expected call of Issue.
+func (mr *MockJWTIssuerMockRecorder) Issue(userUUID, ttl any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Issue", reflect.TypeOf((*MockJWTIssuer)(nil).Issue), userUUID, ttl)
 }

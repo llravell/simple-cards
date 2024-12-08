@@ -8,21 +8,23 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/llravell/simple-cards/internal/controller/http/middleware"
-	"github.com/llravell/simple-cards/internal/entity"
+	"github.com/llravell/simple-cards/pkg/auth"
 	"github.com/stretchr/testify/require"
 )
 
 const (
 	JWTSecretKey = "secret"
 	UserUUID     = "test-uuid"
+	UserTokenTTL = 24 * time.Hour
 )
 
 func buildAuthTokenCookie(t *testing.T) *http.Cookie {
 	t.Helper()
 
-	jwtToken, err := entity.BuildJWTString(UserUUID, []byte(JWTSecretKey))
+	jwtToken, err := auth.NewJWTManager(JWTSecretKey).Issue(UserUUID, UserTokenTTL)
 	require.NoError(t, err)
 
 	return &http.Cookie{

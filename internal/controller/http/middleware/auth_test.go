@@ -8,13 +8,17 @@ import (
 	"github.com/go-chi/chi/v5"
 	testutils "github.com/llravell/simple-cards/internal"
 	"github.com/llravell/simple-cards/internal/controller/http/middleware"
+	"github.com/llravell/simple-cards/pkg/auth"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAuthMiddleware(t *testing.T) {
 	router := chi.NewRouter()
-	authMiddleware := middleware.NewAuthMiddleware(testutils.JWTSecretKey, zerolog.Nop())
+	authMiddleware := middleware.NewAuthMiddleware(
+		auth.NewJWTManager(testutils.JWTSecretKey),
+		zerolog.Nop(),
+	)
 
 	router.Use(authMiddleware)
 	router.Post("/", echoHandler(t))

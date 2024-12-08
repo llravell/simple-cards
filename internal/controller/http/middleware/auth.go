@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/llravell/simple-cards/internal/entity"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/rs/zerolog"
 )
 
@@ -16,9 +16,13 @@ type contextKey string
 
 var userUUIDContextKey contextKey = "userUUID"
 
+type JWTParser interface {
+	Parse(tokenString string) (*jwt.Token, error)
+}
+
 type authenticator struct {
-	secret []byte
-	log    zerolog.Logger
+	jwtParser JWTParser
+	log       zerolog.Logger
 }
 
 func (auth *authenticator) parseUserUUIDFromRequest(r *http.Request) string {
@@ -29,7 +33,7 @@ func (auth *authenticator) parseUserUUIDFromRequest(r *http.Request) string {
 		return ""
 	}
 
-	token, claims, err := entity.ParseJWTString(tokenCookie.Value, auth.secret)
+	token, err := auth.jwtParser.Parse(tokenCookie.Value)
 	if err != nil {
 		auth.log.Error().Err(err).Msg("jwt parsing failed")
 
@@ -42,7 +46,21 @@ func (auth *authenticator) parseUserUUIDFromRequest(r *http.Request) string {
 		return ""
 	}
 
-	return claims.UserUUID
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		auth.log.Error().Err(err).Msg("jwt claims type casting failed")
+
+		return ""
+	}
+
+	userUUID, ok := claims["sub"].(string)
+	if !ok {
+		auth.log.Error().Err(err).Msg("userUUID type casting failed")
+
+		return ""
+	}
+
+	return userUUID
 }
 
 func (auth *authenticator) provideUserUUIDToRequestContext(r *http.Request, userUUID string) *http.Request {
@@ -65,10 +83,10 @@ func (auth *authenticator) Handler(next http.Handler) http.Handler {
 	})
 }
 
-func NewAuthMiddleware(secretKey string, log zerolog.Logger) func(next http.Handler) http.Handler {
+func NewAuthMiddleware(jwtParser JWTParser, log zerolog.Logger) func(next http.Handler) http.Handler {
 	auth := &authenticator{
-		secret: []byte(secretKey),
-		log:    log,
+		jwtParser: jwtParser,
+		log:       log,
 	}
 
 	return auth.Handler
