@@ -7,6 +7,13 @@ definitions:
       password:
         type: string
     type: object
+  cards.createOrUpdateCardRequest:
+    properties:
+      meaning:
+        type: string
+      term:
+        type: string
+    type: object
   entity.Card:
     properties:
       meaning:
@@ -161,6 +168,111 @@ paths:
       summary: Update module
       tags:
       - modules
+  /api/modules/{module_uuid}/cards/:
+    get:
+      parameters:
+      - description: Module UUID
+        in: path
+        name: module_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Card'
+            type: array
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Get all module's cards
+      tags:
+      - cards
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Card params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/cards.createOrUpdateCardRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Card'
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Add new card to module
+      tags:
+      - cards
+  /api/modules/{module_uuid}/cards/{card_uuid}:
+    delete:
+      parameters:
+      - description: Module UUID
+        in: path
+        name: module_uuid
+        required: true
+        type: string
+      - description: Card UUID
+        in: path
+        name: card_uuid
+        required: true
+        type: string
+      responses:
+        "202":
+          description: Accepted
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Delete card
+      tags:
+      - cards
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Module UUID
+        in: path
+        name: module_uuid
+        required: true
+        type: string
+      - description: Card UUID
+        in: path
+        name: card_uuid
+        required: true
+        type: string
+      - description: Card params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/cards.createOrUpdateCardRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Card'
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Update card
+      tags:
+      - cards
   /api/user/login:
     post:
       consumes:

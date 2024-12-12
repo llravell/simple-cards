@@ -82,7 +82,7 @@ func (routes *Routes) Apply(r chi.Router) {
 		r.Get("/", routes.getAllModules)
 		r.Post("/", routes.createModule)
 
-		r.Route("/{id}", func(r chi.Router) {
+		r.Route("/{module_uuid}", func(r chi.Router) {
 			r.Get("/", routes.getModuleWithCards)
 			r.Put("/", routes.updateModule)
 			r.Delete("/", routes.deleteModule)
