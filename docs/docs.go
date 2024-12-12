@@ -19,7 +19,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "produces": [
@@ -47,7 +47,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "consumes": [
@@ -88,7 +88,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "produces": [
@@ -122,7 +122,7 @@ const docTemplate = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "consumes": [
@@ -168,7 +168,7 @@ const docTemplate = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "tags": [
@@ -198,7 +198,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "produces": [
@@ -235,7 +235,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "consumes": [
@@ -276,7 +276,7 @@ const docTemplate = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "consumes": [
@@ -329,7 +329,7 @@ const docTemplate = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "tags": [
@@ -384,7 +384,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.authResponse"
+                        }
                     },
                     "400": {
                         "description": "invalid data"
@@ -420,7 +423,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.authResponse"
+                        }
                     },
                     "400": {
                         "description": "invalid data"
@@ -459,6 +465,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.authResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
                     "type": "string"
                 }
             }
@@ -532,6 +546,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "UsersAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

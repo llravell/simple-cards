@@ -46,7 +46,7 @@ func TestCompressMiddleware(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			res, body := testutils.SendTestRequest(t, ts, ts.Client(), http.MethodPost, "/", tc.body, tc.headers)
+			res, body := testutils.SendTestRequest(t, ts, http.MethodPost, "/", tc.body, tc.headers)
 			defer res.Body.Close()
 
 			if tc.shouldBeCompressed {

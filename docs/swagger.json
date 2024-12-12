@@ -12,7 +12,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "produces": [
@@ -40,7 +40,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "consumes": [
@@ -81,7 +81,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "produces": [
@@ -115,7 +115,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "consumes": [
@@ -161,7 +161,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "tags": [
@@ -191,7 +191,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "produces": [
@@ -228,7 +228,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "consumes": [
@@ -269,7 +269,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "consumes": [
@@ -322,7 +322,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "UsersAuth": []
                     }
                 ],
                 "tags": [
@@ -377,7 +377,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.authResponse"
+                        }
                     },
                     "400": {
                         "description": "invalid data"
@@ -413,7 +416,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.authResponse"
+                        }
                     },
                     "400": {
                         "description": "invalid data"
@@ -452,6 +458,14 @@
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.authResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
                     "type": "string"
                 }
             }
@@ -525,6 +539,13 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "UsersAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

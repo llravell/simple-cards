@@ -54,7 +54,7 @@ func TestLoggerMiddleware(t *testing.T) {
 		out.Reset()
 
 		res, _ := testutils.SendTestRequest(
-			t, ts, ts.Client(), http.MethodPost, "/", strings.NewReader(payload), map[string]string{},
+			t, ts, http.MethodPost, "/", strings.NewReader(payload), map[string]string{},
 		)
 		defer res.Body.Close()
 

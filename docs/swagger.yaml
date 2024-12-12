@@ -7,6 +7,11 @@ definitions:
       password:
         type: string
     type: object
+  auth.authResponse:
+    properties:
+      token:
+        type: string
+    type: object
   cards.createOrUpdateCardRequest:
     properties:
       meaning:
@@ -72,7 +77,7 @@ paths:
         "500":
           description: Internal Server Error
       security:
-      - ApiKeyAuth: []
+      - UsersAuth: []
       summary: Get all user's modules
       tags:
       - modules
@@ -96,7 +101,7 @@ paths:
         "500":
           description: Internal Server Error
       security:
-      - ApiKeyAuth: []
+      - UsersAuth: []
       summary: Create new module
       tags:
       - modules
@@ -114,7 +119,7 @@ paths:
         "500":
           description: Internal Server Error
       security:
-      - ApiKeyAuth: []
+      - UsersAuth: []
       summary: Delete module
       tags:
       - modules
@@ -135,7 +140,7 @@ paths:
         "500":
           description: Internal Server Error
       security:
-      - ApiKeyAuth: []
+      - UsersAuth: []
       summary: Get module with cards
       tags:
       - modules
@@ -164,7 +169,7 @@ paths:
         "500":
           description: Internal Server Error
       security:
-      - ApiKeyAuth: []
+      - UsersAuth: []
       summary: Update module
       tags:
       - modules
@@ -188,7 +193,7 @@ paths:
         "500":
           description: Internal Server Error
       security:
-      - ApiKeyAuth: []
+      - UsersAuth: []
       summary: Get all module's cards
       tags:
       - cards
@@ -212,7 +217,7 @@ paths:
         "500":
           description: Internal Server Error
       security:
-      - ApiKeyAuth: []
+      - UsersAuth: []
       summary: Add new card to module
       tags:
       - cards
@@ -235,7 +240,7 @@ paths:
         "500":
           description: Internal Server Error
       security:
-      - ApiKeyAuth: []
+      - UsersAuth: []
       summary: Delete card
       tags:
       - cards
@@ -269,7 +274,7 @@ paths:
         "500":
           description: Internal Server Error
       security:
-      - ApiKeyAuth: []
+      - UsersAuth: []
       summary: Update card
       tags:
       - cards
@@ -287,6 +292,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/auth.authResponse'
         "400":
           description: invalid data
         "401":
@@ -310,6 +317,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/auth.authResponse'
         "400":
           description: invalid data
         "409":
@@ -329,4 +338,9 @@ paths:
       summary: Check database connection
       tags:
       - health
+securityDefinitions:
+  UsersAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

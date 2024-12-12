@@ -24,9 +24,9 @@ func NewRoutes(log zerolog.Logger) *Routes {
 
 // Swagger spec:
 // @Summary      Get all module's cards
+// @Security     UsersAuth
 // @Tags         cards
 // @Produce      json
-// @Security     ApiKeyAuth
 // @Param        module_uuid path string true "Module UUID"
 // @Success      200  {array}  entity.Card
 // @Failure      500
@@ -35,10 +35,10 @@ func (routes *Routes) getCards(w http.ResponseWriter, r *http.Request) {}
 
 // Swagger spec:
 // @Summary      Add new card to module
+// @Security     UsersAuth
 // @Tags         cards
 // @Accept       json
 // @Produce      json
-// @Security     ApiKeyAuth
 // @Param        request body createOrUpdateCardRequest true "Card params"
 // @Success      201  {object}  entity.Card
 // @Failure      500
@@ -47,10 +47,10 @@ func (routes *Routes) addCard(w http.ResponseWriter, r *http.Request) {}
 
 // Swagger spec:
 // @Summary      Update card
+// @Security     UsersAuth
 // @Tags         cards
 // @Accept       json
 // @Produce      json
-// @Security     ApiKeyAuth
 // @Param        module_uuid path string true "Module UUID"
 // @Param        card_uuid path string true "Card UUID"
 // @Param        request body createOrUpdateCardRequest true "Card params"
@@ -61,8 +61,8 @@ func (routes *Routes) updateCard(w http.ResponseWriter, r *http.Request) {}
 
 // Swagger spec:
 // @Summary      Delete card
+// @Security     UsersAuth
 // @Tags         cards
-// @Security     ApiKeyAuth
 // @Param        module_uuid path string true "Module UUID"
 // @Param        card_uuid path string true "Card UUID"
 // @Success      202

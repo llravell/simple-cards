@@ -23,9 +23,9 @@ func NewRoutes(log zerolog.Logger) *Routes {
 
 // Swagger spec:
 // @Summary      Get all user's modules
+// @Security     UsersAuth
 // @Tags         modules
 // @Produce      json
-// @Security     ApiKeyAuth
 // @Success      200  {array}  entity.Module
 // @Failure      500
 // @Router       /api/modules/ [get]
@@ -33,10 +33,10 @@ func (routes *Routes) getAllModules(w http.ResponseWriter, r *http.Request) {}
 
 // Swagger spec:
 // @Summary      Create new module
+// @Security     UsersAuth
 // @Tags         modules
 // @Accept       json
 // @Produce      json
-// @Security     ApiKeyAuth
 // @Param        request body createOrUpdateModuleRequest true "Module params"
 // @Success      201  {object}  entity.Module
 // @Failure      500
@@ -45,10 +45,10 @@ func (routes *Routes) createModule(w http.ResponseWriter, r *http.Request) {}
 
 // Swagger spec:
 // @Summary      Update module
+// @Security     UsersAuth
 // @Tags         modules
 // @Accept       json
 // @Produce      json
-// @Security     ApiKeyAuth
 // @Param        module_uuid path string true "Module UUID"
 // @Param        request body createOrUpdateModuleRequest true "Module params"
 // @Success      200  {object}  entity.Module
@@ -58,8 +58,8 @@ func (routes *Routes) updateModule(w http.ResponseWriter, r *http.Request) {}
 
 // Swagger spec:
 // @Summary      Delete module
+// @Security     UsersAuth
 // @Tags         modules
-// @Security     ApiKeyAuth
 // @Param        module_uuid path string true "Module UUID"
 // @Success      202
 // @Failure      500
@@ -68,9 +68,9 @@ func (routes *Routes) deleteModule(w http.ResponseWriter, r *http.Request) {}
 
 // Swagger spec:
 // @Summary      Get module with cards
+// @Security     UsersAuth
 // @Tags         modules
 // @Produce      json
-// @Security     ApiKeyAuth
 // @Param        module_uuid path string true "Module UUID"
 // @Success      200  {object}  entity.ModuleWithCards
 // @Failure      500

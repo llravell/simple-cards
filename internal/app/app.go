@@ -76,6 +76,10 @@ func New(
 // @version     1.0
 // @host        localhost:8080
 // @BasePath    /
+
+// @securityDefinitions.apikey UsersAuth
+// @in header
+// @name Authorization
 func (app *App) Run() {
 	healthRoutes := health.NewRoutes(app.healthUseCase, app.log)
 	authRoutes := auth.NewRoutes(app.authUseCase, app.log)

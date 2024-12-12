@@ -8,10 +8,6 @@ import (
 	"github.com/rs/zerolog"
 )
 
-const (
-	TokenCookieName = "user-token"
-)
-
 type contextKey string
 
 var userUUIDContextKey contextKey = "userUUID"
@@ -26,14 +22,16 @@ type authenticator struct {
 }
 
 func (auth *authenticator) parseUserUUIDFromRequest(r *http.Request) string {
-	tokenCookie, err := r.Cookie(TokenCookieName)
-	if err != nil {
-		auth.log.Error().Err(err).Msg("jwt cookie finding failed")
+	tokenString := r.Header.Get("Authorization")
+	if tokenString == "" {
+		auth.log.Error().Msg("jwt header does not exist")
 
 		return ""
 	}
 
-	token, err := auth.jwtParser.Parse(tokenCookie.Value)
+	tokenString = tokenString[len("Bearer "):]
+
+	token, err := auth.jwtParser.Parse(tokenString)
 	if err != nil {
 		auth.log.Error().Err(err).Msg("jwt parsing failed")
 

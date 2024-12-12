@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/llravell/simple-cards/internal/controller/http/middleware"
 	"github.com/llravell/simple-cards/internal/entity"
 	"github.com/rs/zerolog"
 )
@@ -24,6 +23,10 @@ type authUseCase interface {
 type authRequest struct {
 	Login    string `json:"login"`
 	Password string `json:"password"`
+}
+
+type authResponse struct {
+	Token string `json:"token"`
 }
 
 type Routes struct {
@@ -43,7 +46,7 @@ func NewRoutes(authUC authUseCase, log zerolog.Logger) *Routes {
 // @Tags         auth
 // @Accept       json
 // @Param        request body authRequest true "User creds"
-// @Success      200
+// @Success      200  {object}  authResponse
 // @Failure      400  "invalid data"
 // @Failure      409  "user with same login already exists"
 // @Failure      500  "token building error"
@@ -78,12 +81,10 @@ func (routes *Routes) register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     middleware.TokenCookieName,
-		MaxAge:   int(userTokenTTL.Seconds()),
-		HttpOnly: true,
-		Value:    token,
-	})
+	err = json.NewEncoder(w).Encode(authResponse{Token: token})
+	if err != nil {
+		routes.log.Err(err).Msg("response write has been failed")
+	}
 }
 
 // Swagger spec:
@@ -91,7 +92,7 @@ func (routes *Routes) register(w http.ResponseWriter, r *http.Request) {
 // @Tags         auth
 // @Accept       json
 // @Param        request body authRequest true "User creds"
-// @Success      200
+// @Success      200  {object}  authResponse
 // @Failure      400  "invalid data"
 // @Failure      401  "verification failed"
 // @Failure      500  "token building error"
@@ -121,12 +122,10 @@ func (routes *Routes) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     middleware.TokenCookieName,
-		MaxAge:   int(userTokenTTL.Seconds()),
-		HttpOnly: true,
-		Value:    token,
-	})
+	err = json.NewEncoder(w).Encode(authResponse{Token: token})
+	if err != nil {
+		routes.log.Err(err).Msg("response write has been failed")
+	}
 }
 
 func (routes *Routes) Apply(r chi.Router) {

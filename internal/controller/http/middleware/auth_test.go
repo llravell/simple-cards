@@ -26,7 +26,7 @@ func TestAuthMiddleware(t *testing.T) {
 	ts := httptest.NewServer(router)
 
 	t.Run("Middleware return unauthorized status code if token does not exist", func(t *testing.T) {
-		res, _ := testutils.SendTestRequest(t, ts, ts.Client(), http.MethodPost, "/", http.NoBody, map[string]string{})
+		res, _ := testutils.SendTestRequest(t, ts, http.MethodPost, "/", http.NoBody, map[string]string{})
 		defer res.Body.Close()
 
 		assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
@@ -34,7 +34,7 @@ func TestAuthMiddleware(t *testing.T) {
 
 	t.Run("Middleware call original handler if token exists", func(t *testing.T) {
 		res, _ := testutils.SendTestRequest(
-			t, ts, testutils.AuthorizedClient(t, ts), http.MethodPost, "/", http.NoBody, map[string]string{},
+			t, ts, http.MethodPost, "/", http.NoBody, testutils.AuthHeaders(t),
 		)
 		defer res.Body.Close()
 

@@ -69,7 +69,7 @@ func TestHealthRoutes(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.prepareMocks()
 
-			res, body := testutils.SendTestRequest(t, ts, ts.Client(), tc.method, tc.path, tc.body, map[string]string{})
+			res, body := testutils.SendTestRequest(t, ts, tc.method, tc.path, tc.body, map[string]string{})
 			defer res.Body.Close()
 
 			assert.Equal(t, tc.expectedCode, res.StatusCode)

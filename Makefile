@@ -19,6 +19,10 @@ test: ### run tests
 migrate-up: ### run migrations
 	bin/goose up
 
+.PHONY: swag
+swag:
+	swag init -g internal/app/app.go
+
 .PHONY: reqs
 reqs: ### install binary deps to bin/
 	GOBIN=$(LOCAL_BIN) go install go.uber.org/mock/mockgen@latest
