@@ -38,6 +38,16 @@ func NewRoutes(authUC authUseCase, log zerolog.Logger) *Routes {
 	}
 }
 
+// Swagger spec:
+// @Summary      Register new user
+// @Tags         auth
+// @Accept       json
+// @Param        request body authRequest true "User creds"
+// @Success      200
+// @Failure      400  "invalid data"
+// @Failure      409  "user with same login already exists"
+// @Failure      500  "token building error"
+// @Router       /api/user/register [post]
 func (routes *Routes) register(w http.ResponseWriter, r *http.Request) {
 	var requestData authRequest
 
@@ -76,6 +86,16 @@ func (routes *Routes) register(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// Swagger spec:
+// @Summary      Verify user creds and login
+// @Tags         auth
+// @Accept       json
+// @Param        request body authRequest true "User creds"
+// @Success      200
+// @Failure      400  "invalid data"
+// @Failure      401  "verification failed"
+// @Failure      500  "token building error"
+// @Router       /api/user/login [post]
 func (routes *Routes) login(w http.ResponseWriter, r *http.Request) {
 	var requestData authRequest
 

@@ -1,10 +1,64 @@
 basePath: /
+definitions:
+  auth.authRequest:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
   title: Simple Cards API
   version: "1.0"
 paths:
+  /api/user/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User creds
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.authRequest'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: invalid data
+        "401":
+          description: verification failed
+        "500":
+          description: token building error
+      summary: Verify user creds and login
+      tags:
+      - auth
+  /api/user/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User creds
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.authRequest'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: invalid data
+        "409":
+          description: user with same login already exists
+        "500":
+          description: token building error
+      summary: Register new user
+      tags:
+      - auth
   /ping:
     get:
       responses:
