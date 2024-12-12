@@ -7,12 +7,160 @@ definitions:
       password:
         type: string
     type: object
+  entity.Card:
+    properties:
+      meaning:
+        type: string
+      module_uuid:
+        type: string
+      term:
+        type: string
+      uuid:
+        type: string
+    type: object
+  entity.Module:
+    properties:
+      name:
+        type: string
+      user_uuid:
+        type: string
+      uuid:
+        type: string
+    type: object
+  entity.ModuleWithCards:
+    properties:
+      cards:
+        items:
+          $ref: '#/definitions/entity.Card'
+        type: array
+      name:
+        type: string
+      user_uuid:
+        type: string
+      uuid:
+        type: string
+    type: object
+  modules.createOrUpdateModuleRequest:
+    properties:
+      name:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
   title: Simple Cards API
   version: "1.0"
 paths:
+  /api/modules/:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Module'
+            type: array
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Get all user's modules
+      tags:
+      - modules
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Module params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/modules.createOrUpdateModuleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Module'
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Create new module
+      tags:
+      - modules
+  /api/modules/{module_uuid}/:
+    delete:
+      parameters:
+      - description: Module UUID
+        in: path
+        name: module_uuid
+        required: true
+        type: string
+      responses:
+        "202":
+          description: Accepted
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Delete module
+      tags:
+      - modules
+    get:
+      parameters:
+      - description: Module UUID
+        in: path
+        name: module_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.ModuleWithCards'
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Get module with cards
+      tags:
+      - modules
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Module UUID
+        in: path
+        name: module_uuid
+        required: true
+        type: string
+      - description: Module params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/modules.createOrUpdateModuleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Module'
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Update module
+      tags:
+      - modules
   /api/user/login:
     post:
       consumes:

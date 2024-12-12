@@ -5,3 +5,8 @@ type Module struct {
 	Name     string `json:"name"`
 	UserUUID string `json:"user_uuid"`
 }
+
+type ModuleWithCards struct {
+	Module
+	Cards []*Card `json:"cards"`
+}
