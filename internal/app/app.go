@@ -8,11 +8,13 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	_ "github.com/llravell/simple-cards/docs"
 	"github.com/llravell/simple-cards/internal/controller/http/auth"
 	"github.com/llravell/simple-cards/internal/controller/http/health"
 	"github.com/llravell/simple-cards/internal/controller/http/middleware"
 	"github.com/llravell/simple-cards/internal/usecase"
 	"github.com/rs/zerolog"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
 func startServer(addr string, handler http.Handler) error {
@@ -69,6 +71,11 @@ func New(
 	return app
 }
 
+// Swagger spec:
+// @title       Simple Cards API
+// @version     1.0
+// @host        localhost:8080
+// @BasePath    /
 func (app *App) Run() {
 	healthRoutes := health.NewRoutes(app.healthUseCase, app.log)
 	authRoutes := auth.NewRoutes(app.authUseCase, app.log)
@@ -76,6 +83,8 @@ func (app *App) Run() {
 	app.router.Use(middleware.LoggerMiddleware(app.log))
 	healthRoutes.Apply(app.router)
 	authRoutes.Apply(app.router)
+
+	app.router.Get("/swagger/*", httpSwagger.Handler())
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)

@@ -24,6 +24,12 @@ func NewRoutes(healthUC healthUseCase, log zerolog.Logger) *Routes {
 	}
 }
 
+// Swagger spec:
+// @Summary      Check database connection
+// @Tags         health
+// @Success      200
+// @Failure      500
+// @Router       /ping [get]
 func (routes *Routes) ping(w http.ResponseWriter, r *http.Request) {
 	err := routes.healthUC.PingContext(r.Context())
 	if err != nil {

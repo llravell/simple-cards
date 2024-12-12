@@ -1,0 +1,18 @@
+basePath: /
+host: localhost:8080
+info:
+  contact: {}
+  title: Simple Cards API
+  version: "1.0"
+paths:
+  /ping:
+    get:
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+      summary: Check database connection
+      tags:
+      - health
+swagger: "2.0"

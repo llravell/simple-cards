@@ -31,3 +31,6 @@ linters-settings:
       - w http.ResponseWriter
       - r *http.Request
       - r chi.Router
+
+  godot:
+    period: false
