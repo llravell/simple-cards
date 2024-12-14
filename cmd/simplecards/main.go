@@ -32,15 +32,18 @@ func main() {
 	log := logger.Get()
 
 	usersRepository := repository.NewUsersRepository(db)
+	modulesRepository := repository.NewModulesRepository(db)
 	jwtManager := auth.NewJWTManager(cfg.JWTSecret)
 	healthUseCase := usecase.NewHealthUseCase(db)
 	authUseCase := usecase.NewAuthUseCase(usersRepository, jwtManager)
+	modulesUseCase := usecase.NewModulesUseCase(modulesRepository)
 
 	app.New(
 		healthUseCase,
 		authUseCase,
+		modulesUseCase,
+		jwtManager,
 		log,
 		app.Addr(cfg.Addr),
-		app.JWTSecret(cfg.JWTSecret),
 	).Run()
 }

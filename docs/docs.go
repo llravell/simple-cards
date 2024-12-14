@@ -78,6 +78,9 @@ const docTemplate = `{
                             "$ref": "#/definitions/entity.Module"
                         }
                     },
+                    "400": {
+                        "description": "Bad Request"
+                    },
                     "500": {
                         "description": "Internal Server Error"
                     }
@@ -160,6 +163,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/entity.Module"
                         }
                     },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
                     "500": {
                         "description": "Internal Server Error"
                     }
@@ -187,6 +196,9 @@ const docTemplate = `{
                 "responses": {
                     "202": {
                         "description": "Accepted"
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "500": {
                         "description": "Internal Server Error"

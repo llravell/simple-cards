@@ -12,6 +12,7 @@ import (
 	"github.com/llravell/simple-cards/internal/controller/http/auth"
 	"github.com/llravell/simple-cards/internal/controller/http/health"
 	"github.com/llravell/simple-cards/internal/controller/http/middleware"
+	"github.com/llravell/simple-cards/internal/controller/http/modules"
 	"github.com/llravell/simple-cards/internal/usecase"
 	"github.com/rs/zerolog"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
@@ -31,12 +32,13 @@ func startServer(addr string, handler http.Handler) error {
 type Option func(app *App)
 
 type App struct {
-	healthUseCase *usecase.HealthUseCase
-	authUseCase   *usecase.AuthUseCase
-	router        chi.Router
-	log           zerolog.Logger
-	addr          string
-	jwtSecret     string
+	healthUseCase  *usecase.HealthUseCase
+	authUseCase    *usecase.AuthUseCase
+	modulesUseCase *usecase.ModulesUseCase
+	jwtParser      middleware.JWTParser
+	router         chi.Router
+	log            zerolog.Logger
+	addr           string
 }
 
 func Addr(addr string) Option {
@@ -45,23 +47,21 @@ func Addr(addr string) Option {
 	}
 }
 
-func JWTSecret(secret string) Option {
-	return func(app *App) {
-		app.jwtSecret = secret
-	}
-}
-
 func New(
 	healthUseCase *usecase.HealthUseCase,
 	authUseCase *usecase.AuthUseCase,
+	modulesUseCase *usecase.ModulesUseCase,
+	jwtParser middleware.JWTParser,
 	log zerolog.Logger,
 	opts ...Option,
 ) *App {
 	app := &App{
-		healthUseCase: healthUseCase,
-		authUseCase:   authUseCase,
-		log:           log,
-		router:        chi.NewRouter(),
+		healthUseCase:  healthUseCase,
+		authUseCase:    authUseCase,
+		modulesUseCase: modulesUseCase,
+		jwtParser:      jwtParser,
+		log:            log,
+		router:         chi.NewRouter(),
 	}
 
 	for _, opt := range opts {
@@ -83,10 +83,17 @@ func New(
 func (app *App) Run() {
 	healthRoutes := health.NewRoutes(app.healthUseCase, app.log)
 	authRoutes := auth.NewRoutes(app.authUseCase, app.log)
+	modulesRoutes := modules.NewRoutes(app.modulesUseCase, app.log)
 
 	app.router.Use(middleware.LoggerMiddleware(app.log))
 	healthRoutes.Apply(app.router)
 	authRoutes.Apply(app.router)
+
+	app.router.Group(func(r chi.Router) {
+		r.Use(middleware.NewAuthMiddleware(app.jwtParser, app.log))
+
+		modulesRoutes.Apply(r)
+	})
 
 	app.router.Get("/swagger/*", httpSwagger.Handler())
 

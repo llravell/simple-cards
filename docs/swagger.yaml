@@ -98,6 +98,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/entity.Module'
+        "400":
+          description: Bad Request
         "500":
           description: Internal Server Error
       security:
@@ -116,6 +118,8 @@ paths:
       responses:
         "202":
           description: Accepted
+        "400":
+          description: Bad Request
         "500":
           description: Internal Server Error
       security:
@@ -166,6 +170,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/entity.Module'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
         "500":
           description: Internal Server Error
       security:

@@ -19,6 +19,13 @@ type (
 		FindUserByLogin(ctx context.Context, login string) (*entity.User, error)
 	}
 
+	ModuleRepository interface {
+		GetAllModules(ctx context.Context, userUUID string) ([]*entity.Module, error)
+		CreateNewModule(ctx context.Context, userUUID string, moduleName string) (*entity.Module, error)
+		UpdateModule(ctx context.Context, userUUID string, moduleUUID string, moduleName string) (*entity.Module, error)
+		DeleteModule(ctx context.Context, userUUID string, moduleUUID string) error
+	}
+
 	JWTIssuer interface {
 		Issue(userUUID string, ttl time.Duration) (string, error)
 	}
