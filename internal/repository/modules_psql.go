@@ -104,11 +104,40 @@ func (repo *ModulesRepository) UpdateModule(
 	return &module, nil
 }
 
-func (repo *ModulesRepository) DeleteModule(ctx context.Context, userUUID string, moduleUUID string) error {
+func (repo *ModulesRepository) DeleteModule(
+	ctx context.Context,
+	userUUID string,
+	moduleUUID string,
+) error {
 	_, err := repo.conn.ExecContext(ctx, `
 		DELETE FROM modules
 		WHERE uuid=$1 AND user_uuid=$2;
 	`, moduleUUID, userUUID)
 
 	return err
+}
+
+func (repo *ModulesRepository) GetModule(
+	ctx context.Context,
+	userUUID string,
+	moduleUUID string,
+) (*entity.Module, error) {
+	var module entity.Module
+
+	row := repo.conn.QueryRowContext(ctx, `
+		SELECT uuid, name, user_uuid
+		FROM modules
+		WHERE uuid=$1 AND user_uuid=$2;
+	`, moduleUUID, userUUID)
+
+	err := row.Scan(&module.UUID, &module.Name, &module.UserUUID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, &entity.ModuleNotFoundError{UUID: moduleUUID}
+		}
+
+		return nil, err
+	}
+
+	return &module, nil
 }

@@ -33,10 +33,11 @@ func main() {
 
 	usersRepository := repository.NewUsersRepository(db)
 	modulesRepository := repository.NewModulesRepository(db)
+	cardsRepository := repository.NewCardsRepository(db)
 	jwtManager := auth.NewJWTManager(cfg.JWTSecret)
 	healthUseCase := usecase.NewHealthUseCase(db)
 	authUseCase := usecase.NewAuthUseCase(usersRepository, jwtManager)
-	modulesUseCase := usecase.NewModulesUseCase(modulesRepository)
+	modulesUseCase := usecase.NewModulesUseCase(modulesRepository, cardsRepository)
 
 	app.New(
 		healthUseCase,

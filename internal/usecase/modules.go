@@ -7,17 +7,19 @@ import (
 )
 
 type ModulesUseCase struct {
-	repo ModuleRepository
+	modulesRepo ModulesRepository
+	cardsRepo   CardsRepository
 }
 
-func NewModulesUseCase(repo ModuleRepository) *ModulesUseCase {
+func NewModulesUseCase(modulesRepo ModulesRepository, cardsRepo CardsRepository) *ModulesUseCase {
 	return &ModulesUseCase{
-		repo: repo,
+		modulesRepo: modulesRepo,
+		cardsRepo:   cardsRepo,
 	}
 }
 
 func (uc *ModulesUseCase) GetAllModules(ctx context.Context, userUUID string) ([]*entity.Module, error) {
-	return uc.repo.GetAllModules(ctx, userUUID)
+	return uc.modulesRepo.GetAllModules(ctx, userUUID)
 }
 
 func (uc *ModulesUseCase) CreateNewModule(
@@ -25,7 +27,7 @@ func (uc *ModulesUseCase) CreateNewModule(
 	userUUID string,
 	moduleName string,
 ) (*entity.Module, error) {
-	return uc.repo.CreateNewModule(ctx, userUUID, moduleName)
+	return uc.modulesRepo.CreateNewModule(ctx, userUUID, moduleName)
 }
 
 func (uc *ModulesUseCase) UpdateModule(
@@ -34,7 +36,7 @@ func (uc *ModulesUseCase) UpdateModule(
 	moduleUUID string,
 	moduleName string,
 ) (*entity.Module, error) {
-	return uc.repo.UpdateModule(ctx, userUUID, moduleUUID, moduleName)
+	return uc.modulesRepo.UpdateModule(ctx, userUUID, moduleUUID, moduleName)
 }
 
 func (uc *ModulesUseCase) DeleteModule(
@@ -42,5 +44,26 @@ func (uc *ModulesUseCase) DeleteModule(
 	userUUID string,
 	moduleUUID string,
 ) error {
-	return uc.repo.DeleteModule(ctx, userUUID, moduleUUID)
+	return uc.modulesRepo.DeleteModule(ctx, userUUID, moduleUUID)
+}
+
+func (uc *ModulesUseCase) GetModuleWithCards(
+	ctx context.Context,
+	userUUID string,
+	moduleUUID string,
+) (*entity.ModuleWithCards, error) {
+	module, err := uc.modulesRepo.GetModule(ctx, userUUID, moduleUUID)
+	if err != nil {
+		return nil, err
+	}
+
+	cards, err := uc.cardsRepo.GetModuleCards(ctx, moduleUUID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &entity.ModuleWithCards{
+		Module: *module,
+		Cards:  cards,
+	}, nil
 }

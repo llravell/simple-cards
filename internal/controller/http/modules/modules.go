@@ -14,6 +14,7 @@ import (
 
 type ModulesUseCase interface {
 	GetAllModules(ctx context.Context, userUUID string) ([]*entity.Module, error)
+	GetModuleWithCards(ctx context.Context, userUUID string, moduleUUID string) (*entity.ModuleWithCards, error)
 	CreateNewModule(ctx context.Context, userUUID string, moduleName string) (*entity.Module, error)
 	UpdateModule(ctx context.Context, userUUID string, moduleUUID string, moduleName string) (*entity.Module, error)
 	DeleteModule(ctx context.Context, userUUID string, moduleUUID string) error
@@ -194,9 +195,42 @@ func (routes *Routes) deleteModule(w http.ResponseWriter, r *http.Request) {
 // @Produce      json
 // @Param        module_uuid path string true "Module UUID"
 // @Success      200  {object}  entity.ModuleWithCards
+// @Failure      400
+// @Failure      404
 // @Failure      500
 // @Router       /api/modules/{module_uuid}/ [get]
-func (routes *Routes) getModuleWithCards(w http.ResponseWriter, r *http.Request) {}
+func (routes *Routes) getModuleWithCards(w http.ResponseWriter, r *http.Request) {
+	moduleUUID := r.PathValue("module_uuid")
+	if moduleUUID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+
+		return
+	}
+
+	moduleWithCards, err := routes.modulesUC.GetModuleWithCards(
+		r.Context(),
+		middleware.GetUserUUIDFromRequest(r),
+		moduleUUID,
+	)
+	if err != nil {
+		var notFoundErr *entity.ModuleNotFoundError
+
+		if errors.As(err, &notFoundErr) {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+
+		routes.log.Error().Err(err).Msg("module searching failed")
+
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(moduleWithCards)
+	if err != nil {
+		routes.log.Err(err).Msg("response write has been failed")
+	}
+}
 
 func (routes *Routes) Apply(r chi.Router) {
 	r.Route("/api/modules", func(r chi.Router) {
