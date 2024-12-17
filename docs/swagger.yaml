@@ -65,7 +65,10 @@ definitions:
   modules.createOrUpdateModuleRequest:
     properties:
       name:
+        maxLength: 100
         type: string
+    required:
+    - name
     type: object
 host: localhost:8080
 info:

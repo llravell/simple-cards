@@ -94,6 +94,7 @@ func (repo *CardsRepository) SaveCard(ctx context.Context, card *entity.Card) (*
 		setParts = append(setParts, part)
 	}
 
+	//nolint:gosec
 	query := fmt.Sprintf(`
 		UPDATE cards
 		SET %s
@@ -109,7 +110,7 @@ func (repo *CardsRepository) SaveCard(ctx context.Context, card *entity.Card) (*
 }
 
 func (repo *CardsRepository) DeleteCard(ctx context.Context, moduleUUID string, cardUUID string) error {
-	_, err := repo.conn.Exec(`
+	_, err := repo.conn.ExecContext(ctx, `
 		DELETE FROM cards
 		WHERE uuid=$1 AND module_uuid=$2;
 	`, cardUUID, moduleUUID)

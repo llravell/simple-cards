@@ -14,11 +14,11 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type ModulesUseCase interface {
+type modulesUseCase interface {
 	ModuleExists(ctx context.Context, userUUID string, moduleUUID string) (bool, error)
 }
 
-type CardsUseCase interface {
+type cardsUseCase interface {
 	GetModuleCards(ctx context.Context, moduleUUID string) ([]*entity.Card, error)
 	CreateCard(ctx context.Context, card *entity.Card) (*entity.Card, error)
 	SaveCard(ctx context.Context, card *entity.Card) (*entity.Card, error)
@@ -37,14 +37,14 @@ type updateCardRequest struct {
 
 type Routes struct {
 	log       zerolog.Logger
-	modulesUC ModulesUseCase
-	cardsUC   CardsUseCase
+	modulesUC modulesUseCase
+	cardsUC   cardsUseCase
 	validator *validator.Validate
 }
 
 func NewRoutes(
-	modulesUC ModulesUseCase,
-	cardsUC CardsUseCase,
+	modulesUC modulesUseCase,
+	cardsUC cardsUseCase,
 	log zerolog.Logger,
 ) *Routes {
 	return &Routes{

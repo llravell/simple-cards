@@ -605,9 +605,13 @@ const docTemplate = `{
         },
         "modules.createOrUpdateModuleRequest": {
             "type": "object",
+            "required": [
+                "name"
+            ],
             "properties": {
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 100
                 }
             }
         }

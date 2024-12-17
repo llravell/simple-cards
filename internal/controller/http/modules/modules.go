@@ -5,14 +5,16 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-playground/validator/v10"
 	"github.com/llravell/simple-cards/internal/controller/http/middleware"
 	"github.com/llravell/simple-cards/internal/entity"
 	"github.com/rs/zerolog"
 )
 
-type ModulesUseCase interface {
+type modulesUseCase interface {
 	GetAllModules(ctx context.Context, userUUID string) ([]*entity.Module, error)
 	GetModuleWithCards(ctx context.Context, userUUID string, moduleUUID string) (*entity.ModuleWithCards, error)
 	CreateNewModule(ctx context.Context, userUUID string, moduleName string) (*entity.Module, error)
@@ -21,18 +23,27 @@ type ModulesUseCase interface {
 }
 
 type createOrUpdateModuleRequest struct {
-	Name string `json:"name"`
+	Name string `json:"name" validate:"required,max=100"`
 }
 
 type Routes struct {
 	log       zerolog.Logger
-	modulesUC ModulesUseCase
+	modulesUC modulesUseCase
+	validator *validator.Validate
 }
 
-func NewRoutes(modulesUC ModulesUseCase, log zerolog.Logger) *Routes {
+func NewRoutes(modulesUC modulesUseCase, log zerolog.Logger) *Routes {
 	return &Routes{
 		log:       log,
 		modulesUC: modulesUC,
+		validator: validator.New(),
+	}
+}
+
+func (routes *Routes) jsonResponse(w http.ResponseWriter, v any) {
+	err := json.NewEncoder(w).Encode(v)
+	if err != nil {
+		routes.log.Err(err).Msg("response write has been failed")
 	}
 }
 
@@ -54,10 +65,7 @@ func (routes *Routes) getAllModules(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(modules)
-	if err != nil {
-		routes.log.Err(err).Msg("response write has been failed")
-	}
+	routes.jsonResponse(w, modules)
 }
 
 // Swagger spec:
@@ -72,10 +80,18 @@ func (routes *Routes) getAllModules(w http.ResponseWriter, r *http.Request) {
 // @Failure      500
 // @Router       /api/modules/ [post]
 func (routes *Routes) createModule(w http.ResponseWriter, r *http.Request) {
-	var moduleData createOrUpdateModuleRequest
+	var req createOrUpdateModuleRequest
 
-	if err := json.NewDecoder(r.Body).Decode(&moduleData); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+
+		return
+	}
+
+	req.Name = strings.TrimSpace(req.Name)
+
+	if err := routes.validator.Struct(req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 
 		return
 	}
@@ -83,7 +99,7 @@ func (routes *Routes) createModule(w http.ResponseWriter, r *http.Request) {
 	module, err := routes.modulesUC.CreateNewModule(
 		r.Context(),
 		middleware.GetUserUUIDFromRequest(r),
-		moduleData.Name,
+		req.Name,
 	)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -93,10 +109,7 @@ func (routes *Routes) createModule(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 
-	err = json.NewEncoder(w).Encode(module)
-	if err != nil {
-		routes.log.Err(err).Msg("response write has been failed")
-	}
+	routes.jsonResponse(w, module)
 }
 
 // Swagger spec:
@@ -120,10 +133,18 @@ func (routes *Routes) updateModule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var moduleData createOrUpdateModuleRequest
+	var req createOrUpdateModuleRequest
 
-	if err := json.NewDecoder(r.Body).Decode(&moduleData); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+
+		return
+	}
+
+	req.Name = strings.TrimSpace(req.Name)
+
+	if err := routes.validator.Struct(req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 
 		return
 	}
@@ -132,7 +153,7 @@ func (routes *Routes) updateModule(w http.ResponseWriter, r *http.Request) {
 		r.Context(),
 		middleware.GetUserUUIDFromRequest(r),
 		moduleUUID,
-		moduleData.Name,
+		req.Name,
 	)
 	if err != nil {
 		var notFoundErr *entity.ModuleNotFoundError
@@ -150,10 +171,7 @@ func (routes *Routes) updateModule(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 
-	err = json.NewEncoder(w).Encode(module)
-	if err != nil {
-		routes.log.Err(err).Msg("response write has been failed")
-	}
+	routes.jsonResponse(w, module)
 }
 
 // Swagger spec:
@@ -226,10 +244,7 @@ func (routes *Routes) getModuleWithCards(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(moduleWithCards)
-	if err != nil {
-		routes.log.Err(err).Msg("response write has been failed")
-	}
+	routes.jsonResponse(w, moduleWithCards)
 }
 
 func (routes *Routes) Apply(r chi.Router) {

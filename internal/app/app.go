@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	_ "github.com/llravell/simple-cards/docs"
+	_ "github.com/llravell/simple-cards/docs" //nolint:blank-imports
 	"github.com/llravell/simple-cards/internal/controller/http/auth"
 	"github.com/llravell/simple-cards/internal/controller/http/cards"
 	"github.com/llravell/simple-cards/internal/controller/http/health"
