@@ -21,8 +21,6 @@ import (
 
 type testCase struct {
 	name         string
-	method       string
-	path         string
 	mock         func()
 	body         io.Reader
 	expectedCode int
@@ -60,9 +58,7 @@ func TestGetCards(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name:   "module checking error",
-			method: http.MethodGet,
-			path:   "/api/modules/module-uuid/cards",
+			name: "module checking error",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -71,9 +67,7 @@ func TestGetCards(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
-			name:   "module checking failed",
-			method: http.MethodGet,
-			path:   "/api/modules/module-uuid/cards",
+			name: "module checking failed",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -82,9 +76,7 @@ func TestGetCards(t *testing.T) {
 			expectedCode: http.StatusNotFound,
 		},
 		{
-			name:   "cards fetching error",
-			method: http.MethodGet,
-			path:   "/api/modules/module-uuid/cards",
+			name: "cards fetching error",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -97,9 +89,7 @@ func TestGetCards(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
-			name:   "cards returned successfully",
-			method: http.MethodGet,
-			path:   "/api/modules/module-uuid/cards",
+			name: "cards returned successfully",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -118,7 +108,10 @@ func TestGetCards(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mock()
 
-			res, body := testutils.SendTestRequest(t, ts, tc.method, tc.path, tc.body, map[string]string{})
+			res, body := testutils.SendTestRequest(
+				t, ts, http.MethodGet,
+				"/api/modules/module-uuid/cards", tc.body, map[string]string{},
+			)
 			defer res.Body.Close()
 
 			assert.Equal(t, tc.expectedCode, res.StatusCode)
@@ -140,9 +133,7 @@ func TestAddCard(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name:   "module checking error",
-			method: http.MethodPost,
-			path:   "/api/modules/module-uuid/cards",
+			name: "module checking error",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -151,9 +142,7 @@ func TestAddCard(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
-			name:   "module checking failed",
-			method: http.MethodPost,
-			path:   "/api/modules/module-uuid/cards",
+			name: "module checking failed",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -162,9 +151,7 @@ func TestAddCard(t *testing.T) {
 			expectedCode: http.StatusNotFound,
 		},
 		{
-			name:   "unexpected format",
-			method: http.MethodPost,
-			path:   "/api/modules/module-uuid/cards",
+			name: "unexpected format",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -174,9 +161,7 @@ func TestAddCard(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:   "send empty term",
-			method: http.MethodPost,
-			path:   "/api/modules/module-uuid/cards",
+			name: "send empty term",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -189,9 +174,7 @@ func TestAddCard(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:   "send empty meaning",
-			method: http.MethodPost,
-			path:   "/api/modules/module-uuid/cards",
+			name: "send empty meaning",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -204,9 +187,7 @@ func TestAddCard(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:   "card creating error",
-			method: http.MethodPost,
-			path:   "/api/modules/module-uuid/cards",
+			name: "card creating error",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -223,9 +204,7 @@ func TestAddCard(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
-			name:   "card created successfully",
-			method: http.MethodPost,
-			path:   "/api/modules/module-uuid/cards",
+			name: "card created successfully",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -248,7 +227,10 @@ func TestAddCard(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mock()
 
-			res, body := testutils.SendTestRequest(t, ts, tc.method, tc.path, tc.body, map[string]string{})
+			res, body := testutils.SendTestRequest(
+				t, ts, http.MethodPost,
+				"/api/modules/module-uuid/cards", tc.body, map[string]string{},
+			)
 			defer res.Body.Close()
 
 			assert.Equal(t, tc.expectedCode, res.StatusCode)
@@ -270,9 +252,7 @@ func TestUpdateCard(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name:   "module checking error",
-			method: http.MethodPut,
-			path:   "/api/modules/module-uuid/cards/card-uuid",
+			name: "module checking error",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -281,9 +261,7 @@ func TestUpdateCard(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
-			name:   "module checking failed",
-			method: http.MethodPut,
-			path:   "/api/modules/module-uuid/cards/card-uuid",
+			name: "module checking failed",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -292,9 +270,7 @@ func TestUpdateCard(t *testing.T) {
 			expectedCode: http.StatusNotFound,
 		},
 		{
-			name:   "unexpected format",
-			method: http.MethodPut,
-			path:   "/api/modules/module-uuid/cards/card-uuid",
+			name: "unexpected format",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -304,9 +280,7 @@ func TestUpdateCard(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:   "send empty term and meaning",
-			method: http.MethodPut,
-			path:   "/api/modules/module-uuid/cards/card-uuid",
+			name: "send empty term and meaning",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -319,9 +293,7 @@ func TestUpdateCard(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:   "card updating error",
-			method: http.MethodPut,
-			path:   "/api/modules/module-uuid/cards/card-uuid",
+			name: "card updating error",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -338,9 +310,7 @@ func TestUpdateCard(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
-			name:   "card not found error",
-			method: http.MethodPut,
-			path:   "/api/modules/module-uuid/cards/card-uuid",
+			name: "card not found error",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -357,9 +327,7 @@ func TestUpdateCard(t *testing.T) {
 			expectedCode: http.StatusNotFound,
 		},
 		{
-			name:   "card updated successfully",
-			method: http.MethodPut,
-			path:   "/api/modules/module-uuid/cards/card-uuid",
+			name: "card updated successfully",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -382,7 +350,10 @@ func TestUpdateCard(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mock()
 
-			res, body := testutils.SendTestRequest(t, ts, tc.method, tc.path, tc.body, map[string]string{})
+			res, body := testutils.SendTestRequest(
+				t, ts, http.MethodPut,
+				"/api/modules/module-uuid/cards/card-uuid", tc.body, map[string]string{},
+			)
 			defer res.Body.Close()
 
 			assert.Equal(t, tc.expectedCode, res.StatusCode)
@@ -404,9 +375,7 @@ func TestDeleteCard(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name:   "module checking error",
-			method: http.MethodDelete,
-			path:   "/api/modules/module-uuid/cards/card-uuid",
+			name: "module checking error",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -415,9 +384,7 @@ func TestDeleteCard(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
-			name:   "module checking failed",
-			method: http.MethodDelete,
-			path:   "/api/modules/module-uuid/cards/card-uuid",
+			name: "module checking failed",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -426,9 +393,7 @@ func TestDeleteCard(t *testing.T) {
 			expectedCode: http.StatusNotFound,
 		},
 		{
-			name:   "card deleting error",
-			method: http.MethodDelete,
-			path:   "/api/modules/module-uuid/cards/card-uuid",
+			name: "card deleting error",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -441,9 +406,7 @@ func TestDeleteCard(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
-			name:   "cards deleted successfully",
-			method: http.MethodDelete,
-			path:   "/api/modules/module-uuid/cards/card-uuid",
+			name: "cards deleted successfully",
 			mock: func() {
 				modulesRepo.EXPECT().
 					ModuleExists(gomock.Any(), gomock.Any(), "module-uuid").
@@ -461,7 +424,10 @@ func TestDeleteCard(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mock()
 
-			res, body := testutils.SendTestRequest(t, ts, tc.method, tc.path, tc.body, map[string]string{})
+			res, body := testutils.SendTestRequest(
+				t, ts, http.MethodDelete,
+				"/api/modules/module-uuid/cards/card-uuid", tc.body, map[string]string{},
+			)
 			defer res.Body.Close()
 
 			assert.Equal(t, tc.expectedCode, res.StatusCode)

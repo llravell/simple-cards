@@ -21,8 +21,6 @@ import (
 
 type testCase struct {
 	name         string
-	method       string
-	path         string
 	mock         func()
 	body         io.Reader
 	expectedCode int
@@ -64,9 +62,7 @@ func TestGetAllModules(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name:   "repo error",
-			method: http.MethodGet,
-			path:   "/api/modules",
+			name: "repo error",
 			mock: func() {
 				modulesRepo.EXPECT().
 					GetAllModules(gomock.Any(), gomock.Any()).
@@ -75,9 +71,7 @@ func TestGetAllModules(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
-			name:   "modules returned successfully",
-			method: http.MethodGet,
-			path:   "/api/modules",
+			name: "modules returned successfully",
 			mock: func() {
 				modulesRepo.EXPECT().
 					GetAllModules(gomock.Any(), gomock.Any()).
@@ -92,7 +86,7 @@ func TestGetAllModules(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mock()
 
-			res, body := testutils.SendTestRequest(t, ts, tc.method, tc.path, tc.body, map[string]string{})
+			res, body := testutils.SendTestRequest(t, ts, http.MethodGet, "/api/modules", tc.body, map[string]string{})
 			defer res.Body.Close()
 
 			assert.Equal(t, tc.expectedCode, res.StatusCode)
@@ -115,36 +109,28 @@ func TestCreateModule(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:         "unexpected format",
-			method:       http.MethodPost,
-			path:         "/api/modules",
 			mock:         func() {},
 			body:         strings.NewReader("not json"),
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:   "send empty module name",
-			method: http.MethodPost,
-			path:   "/api/modules",
-			mock:   func() {},
+			name: "send empty module name",
+			mock: func() {},
 			body: strings.NewReader(testutils.ToJSON(t, map[string]string{
 				"name": "",
 			})),
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:   "send module name longer than 100",
-			method: http.MethodPost,
-			path:   "/api/modules",
-			mock:   func() {},
+			name: "send module name longer than 100",
+			mock: func() {},
 			body: strings.NewReader(testutils.ToJSON(t, map[string]string{
 				"name": strings.Repeat("a", 101),
 			})),
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:   "repo error",
-			method: http.MethodPost,
-			path:   "/api/modules",
+			name: "repo error",
 			mock: func() {
 				modulesRepo.EXPECT().
 					CreateNewModule(gomock.Any(), gomock.Any(), gomock.Any()).
@@ -156,9 +142,7 @@ func TestCreateModule(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
-			name:   "created successfully",
-			method: http.MethodPost,
-			path:   "/api/modules",
+			name: "created successfully",
 			mock: func() {
 				modulesRepo.EXPECT().
 					CreateNewModule(gomock.Any(), gomock.Any(), gomock.Any()).
@@ -176,7 +160,7 @@ func TestCreateModule(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mock()
 
-			res, body := testutils.SendTestRequest(t, ts, tc.method, tc.path, tc.body, map[string]string{})
+			res, body := testutils.SendTestRequest(t, ts, http.MethodPost, "/api/modules", tc.body, map[string]string{})
 			defer res.Body.Close()
 
 			assert.Equal(t, tc.expectedCode, res.StatusCode)
@@ -199,36 +183,28 @@ func TestUpdateModule(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:         "unexpected format",
-			method:       http.MethodPut,
-			path:         "/api/modules/module-uuid",
 			mock:         func() {},
 			body:         strings.NewReader("not json"),
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:   "send empty module name",
-			method: http.MethodPut,
-			path:   "/api/modules/module-uuid",
-			mock:   func() {},
+			name: "send empty module name",
+			mock: func() {},
 			body: strings.NewReader(testutils.ToJSON(t, map[string]string{
 				"name": "",
 			})),
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:   "send module name longer than 100",
-			method: http.MethodPut,
-			path:   "/api/modules/module-uuid",
-			mock:   func() {},
+			name: "send module name longer than 100",
+			mock: func() {},
 			body: strings.NewReader(testutils.ToJSON(t, map[string]string{
 				"name": strings.Repeat("a", 101),
 			})),
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:   "repo error",
-			method: http.MethodPut,
-			path:   "/api/modules/module-uuid",
+			name: "repo error",
 			mock: func() {
 				modulesRepo.EXPECT().
 					UpdateModule(gomock.Any(), gomock.Any(), "module-uuid", gomock.Any()).
@@ -240,9 +216,7 @@ func TestUpdateModule(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
-			name:   "created successfully",
-			method: http.MethodPut,
-			path:   "/api/modules/module-uuid",
+			name: "created successfully",
 			mock: func() {
 				modulesRepo.EXPECT().
 					UpdateModule(gomock.Any(), gomock.Any(), "module-uuid", gomock.Any()).
@@ -260,7 +234,10 @@ func TestUpdateModule(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mock()
 
-			res, body := testutils.SendTestRequest(t, ts, tc.method, tc.path, tc.body, map[string]string{})
+			res, body := testutils.SendTestRequest(
+				t, ts, http.MethodPut,
+				"/api/modules/module-uuid", tc.body, map[string]string{},
+			)
 			defer res.Body.Close()
 
 			assert.Equal(t, tc.expectedCode, res.StatusCode)
@@ -281,9 +258,7 @@ func TestDeleteModule(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name:   "repo error",
-			method: http.MethodDelete,
-			path:   "/api/modules/module-uuid",
+			name: "repo error",
 			mock: func() {
 				modulesRepo.EXPECT().
 					DeleteModule(gomock.Any(), gomock.Any(), "module-uuid").
@@ -292,9 +267,7 @@ func TestDeleteModule(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
-			name:   "deleted successfully",
-			method: http.MethodDelete,
-			path:   "/api/modules/module-uuid",
+			name: "deleted successfully",
 			mock: func() {
 				modulesRepo.EXPECT().
 					DeleteModule(gomock.Any(), gomock.Any(), "module-uuid").
@@ -308,7 +281,10 @@ func TestDeleteModule(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mock()
 
-			res, body := testutils.SendTestRequest(t, ts, tc.method, tc.path, tc.body, map[string]string{})
+			res, body := testutils.SendTestRequest(
+				t, ts, http.MethodDelete,
+				"/api/modules/module-uuid", tc.body, map[string]string{},
+			)
 			defer res.Body.Close()
 
 			assert.Equal(t, tc.expectedCode, res.StatusCode)
@@ -335,9 +311,7 @@ func TestGetModuleWithCards(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name:   "repo error",
-			method: http.MethodGet,
-			path:   "/api/modules/module-uuid",
+			name: "repo error",
 			mock: func() {
 				modulesRepo.EXPECT().
 					GetModule(gomock.Any(), gomock.Any(), "module-uuid").
@@ -346,9 +320,7 @@ func TestGetModuleWithCards(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
-			name:   "repo not found error",
-			method: http.MethodGet,
-			path:   "/api/modules/module-uuid",
+			name: "repo not found error",
 			mock: func() {
 				modulesRepo.EXPECT().
 					GetModule(gomock.Any(), gomock.Any(), "module-uuid").
@@ -357,9 +329,7 @@ func TestGetModuleWithCards(t *testing.T) {
 			expectedCode: http.StatusNotFound,
 		},
 		{
-			name:   "cards repo error",
-			method: http.MethodGet,
-			path:   "/api/modules/module-uuid",
+			name: "cards repo error",
 			mock: func() {
 				modulesRepo.EXPECT().
 					GetModule(gomock.Any(), gomock.Any(), "module-uuid").
@@ -372,9 +342,7 @@ func TestGetModuleWithCards(t *testing.T) {
 			expectedCode: http.StatusInternalServerError,
 		},
 		{
-			name:   "module with cards returned successfully",
-			method: http.MethodGet,
-			path:   "/api/modules/module-uuid",
+			name: "module with cards returned successfully",
 			mock: func() {
 				modulesRepo.EXPECT().
 					GetModule(gomock.Any(), gomock.Any(), "module-uuid").
@@ -393,7 +361,10 @@ func TestGetModuleWithCards(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mock()
 
-			res, body := testutils.SendTestRequest(t, ts, tc.method, tc.path, tc.body, map[string]string{})
+			res, body := testutils.SendTestRequest(
+				t, ts, http.MethodGet,
+				"/api/modules/module-uuid", tc.body, map[string]string{},
+			)
 			defer res.Body.Close()
 
 			assert.Equal(t, tc.expectedCode, res.StatusCode)
