@@ -34,3 +34,7 @@ linters-settings:
 
   godot:
     period: false
+
+  mnd:
+    ignored-files:
+      - '.+_psql.go'

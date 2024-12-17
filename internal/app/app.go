@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	_ "github.com/llravell/simple-cards/docs"
 	"github.com/llravell/simple-cards/internal/controller/http/auth"
+	"github.com/llravell/simple-cards/internal/controller/http/cards"
 	"github.com/llravell/simple-cards/internal/controller/http/health"
 	"github.com/llravell/simple-cards/internal/controller/http/middleware"
 	"github.com/llravell/simple-cards/internal/controller/http/modules"
@@ -35,6 +36,7 @@ type App struct {
 	healthUseCase  *usecase.HealthUseCase
 	authUseCase    *usecase.AuthUseCase
 	modulesUseCase *usecase.ModulesUseCase
+	cardsUseCase   *usecase.CardsUseCase
 	jwtParser      middleware.JWTParser
 	router         chi.Router
 	log            zerolog.Logger
@@ -51,6 +53,7 @@ func New(
 	healthUseCase *usecase.HealthUseCase,
 	authUseCase *usecase.AuthUseCase,
 	modulesUseCase *usecase.ModulesUseCase,
+	cardsUseCase *usecase.CardsUseCase,
 	jwtParser middleware.JWTParser,
 	log zerolog.Logger,
 	opts ...Option,
@@ -59,6 +62,7 @@ func New(
 		healthUseCase:  healthUseCase,
 		authUseCase:    authUseCase,
 		modulesUseCase: modulesUseCase,
+		cardsUseCase:   cardsUseCase,
 		jwtParser:      jwtParser,
 		log:            log,
 		router:         chi.NewRouter(),
@@ -84,6 +88,7 @@ func (app *App) Run() {
 	healthRoutes := health.NewRoutes(app.healthUseCase, app.log)
 	authRoutes := auth.NewRoutes(app.authUseCase, app.log)
 	modulesRoutes := modules.NewRoutes(app.modulesUseCase, app.log)
+	cardsRoutes := cards.NewRoutes(app.modulesUseCase, app.cardsUseCase, app.log)
 
 	app.router.Use(middleware.LoggerMiddleware(app.log))
 	healthRoutes.Apply(app.router)
@@ -93,6 +98,7 @@ func (app *App) Run() {
 		r.Use(middleware.NewAuthMiddleware(app.jwtParser, app.log))
 
 		modulesRoutes.Apply(r)
+		cardsRoutes.Apply(r)
 	})
 
 	app.router.Get("/swagger/*", httpSwagger.Handler())

@@ -25,10 +25,14 @@ type (
 		CreateNewModule(ctx context.Context, userUUID string, moduleName string) (*entity.Module, error)
 		UpdateModule(ctx context.Context, userUUID string, moduleUUID string, moduleName string) (*entity.Module, error)
 		DeleteModule(ctx context.Context, userUUID string, moduleUUID string) error
+		ModuleExists(ctx context.Context, userUUID string, moduleUUID string) (bool, error)
 	}
 
 	CardsRepository interface {
 		GetModuleCards(ctx context.Context, moduleUUID string) ([]*entity.Card, error)
+		CreateCard(ctx context.Context, card *entity.Card) (*entity.Card, error)
+		SaveCard(ctx context.Context, card *entity.Card) (*entity.Card, error)
+		DeleteCard(ctx context.Context, moduleUUID string, cardUUID string) error
 	}
 
 	JWTIssuer interface {

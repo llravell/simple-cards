@@ -117,6 +117,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/entity.ModuleWithCards"
                         }
                     },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
                     "500": {
                         "description": "Internal Server Error"
                     }
@@ -239,6 +245,12 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
                     "500": {
                         "description": "Internal Server Error"
                     }
@@ -262,12 +274,19 @@ const docTemplate = `{
                 "summary": "Add new card to module",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Module UUID",
+                        "name": "module_uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "description": "Card params",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/cards.createOrUpdateCardRequest"
+                            "$ref": "#/definitions/cards.createCardRequest"
                         }
                     }
                 ],
@@ -277,6 +296,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/entity.Card"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -317,12 +342,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Card params",
+                        "description": "Card update params",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/cards.createOrUpdateCardRequest"
+                            "$ref": "#/definitions/cards.updateCardRequest"
                         }
                     }
                 ],
@@ -332,6 +357,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/entity.Card"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -367,6 +398,12 @@ const docTemplate = `{
                 "responses": {
                     "202": {
                         "description": "Accepted"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -489,7 +526,22 @@ const docTemplate = `{
                 }
             }
         },
-        "cards.createOrUpdateCardRequest": {
+        "cards.createCardRequest": {
+            "type": "object",
+            "required": [
+                "meaning",
+                "term"
+            ],
+            "properties": {
+                "meaning": {
+                    "type": "string"
+                },
+                "term": {
+                    "type": "string"
+                }
+            }
+        },
+        "cards.updateCardRequest": {
             "type": "object",
             "properties": {
                 "meaning": {

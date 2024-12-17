@@ -38,11 +38,13 @@ func main() {
 	healthUseCase := usecase.NewHealthUseCase(db)
 	authUseCase := usecase.NewAuthUseCase(usersRepository, jwtManager)
 	modulesUseCase := usecase.NewModulesUseCase(modulesRepository, cardsRepository)
+	cardsUseCase := usecase.NewCardsUseCase(cardsRepository)
 
 	app.New(
 		healthUseCase,
 		authUseCase,
 		modulesUseCase,
+		cardsUseCase,
 		jwtManager,
 		log,
 		app.Addr(cfg.Addr),

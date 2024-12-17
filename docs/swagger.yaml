@@ -12,7 +12,17 @@ definitions:
       token:
         type: string
     type: object
-  cards.createOrUpdateCardRequest:
+  cards.createCardRequest:
+    properties:
+      meaning:
+        type: string
+      term:
+        type: string
+    required:
+    - meaning
+    - term
+    type: object
+  cards.updateCardRequest:
     properties:
       meaning:
         type: string
@@ -141,6 +151,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/entity.ModuleWithCards'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
         "500":
           description: Internal Server Error
       security:
@@ -198,6 +212,10 @@ paths:
             items:
               $ref: '#/definitions/entity.Card'
             type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
         "500":
           description: Internal Server Error
       security:
@@ -209,12 +227,17 @@ paths:
       consumes:
       - application/json
       parameters:
+      - description: Module UUID
+        in: path
+        name: module_uuid
+        required: true
+        type: string
       - description: Card params
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/cards.createOrUpdateCardRequest'
+          $ref: '#/definitions/cards.createCardRequest'
       produces:
       - application/json
       responses:
@@ -222,6 +245,10 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/entity.Card'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
         "500":
           description: Internal Server Error
       security:
@@ -245,6 +272,10 @@ paths:
       responses:
         "202":
           description: Accepted
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
         "500":
           description: Internal Server Error
       security:
@@ -266,12 +297,12 @@ paths:
         name: card_uuid
         required: true
         type: string
-      - description: Card params
+      - description: Card update params
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/cards.createOrUpdateCardRequest'
+          $ref: '#/definitions/cards.updateCardRequest'
       produces:
       - application/json
       responses:
@@ -279,6 +310,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/entity.Card'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
         "500":
           description: Internal Server Error
       security:

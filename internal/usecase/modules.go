@@ -22,6 +22,10 @@ func (uc *ModulesUseCase) GetAllModules(ctx context.Context, userUUID string) ([
 	return uc.modulesRepo.GetAllModules(ctx, userUUID)
 }
 
+func (uc *ModulesUseCase) ModuleExists(ctx context.Context, userUUID string, moduleUUID string) (bool, error) {
+	return uc.modulesRepo.ModuleExists(ctx, userUUID, moduleUUID)
+}
+
 func (uc *ModulesUseCase) CreateNewModule(
 	ctx context.Context,
 	userUUID string,

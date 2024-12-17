@@ -141,3 +141,26 @@ func (repo *ModulesRepository) GetModule(
 
 	return &module, nil
 }
+
+func (repo *ModulesRepository) ModuleExists(
+	ctx context.Context,
+	userUUID string,
+	moduleUUID string,
+) (bool, error) {
+	row := repo.conn.QueryRowContext(ctx, `
+		SELECT uuid
+		FROM modules
+		WHERE uuid=$1 AND user_uuid=$2;
+	`, moduleUUID, userUUID)
+
+	err := row.Scan(&moduleUUID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
+
+		return false, err
+	}
+
+	return true, nil
+}
