@@ -13,6 +13,7 @@ linters:
     - paralleltest
     - ireturn
     - testifylint
+    - err113
 
 linters-settings:
   depguard:

@@ -61,6 +61,7 @@ func (routes *Routes) getAllModules(w http.ResponseWriter, r *http.Request) {
 	modules, err := routes.modulesUC.GetAllModules(r.Context(), userUUID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		routes.log.Error().Err(err).Msg("modules fetching failed")
 
 		return
 	}
@@ -126,13 +127,6 @@ func (routes *Routes) createModule(w http.ResponseWriter, r *http.Request) {
 // @Failure      500
 // @Router       /api/modules/{module_uuid}/ [put]
 func (routes *Routes) updateModule(w http.ResponseWriter, r *http.Request) {
-	moduleUUID := r.PathValue("module_uuid")
-	if moduleUUID == "" {
-		w.WriteHeader(http.StatusBadRequest)
-
-		return
-	}
-
 	var req createOrUpdateModuleRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -152,7 +146,7 @@ func (routes *Routes) updateModule(w http.ResponseWriter, r *http.Request) {
 	module, err := routes.modulesUC.UpdateModule(
 		r.Context(),
 		middleware.GetUserUUIDFromRequest(r),
-		moduleUUID,
+		r.PathValue("module_uuid"),
 		req.Name,
 	)
 	if err != nil {
@@ -169,8 +163,6 @@ func (routes *Routes) updateModule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
-
 	routes.jsonResponse(w, module)
 }
 
@@ -180,21 +172,13 @@ func (routes *Routes) updateModule(w http.ResponseWriter, r *http.Request) {
 // @Tags         modules
 // @Param        module_uuid path string true "Module UUID"
 // @Success      202
-// @Success      400
 // @Failure      500
 // @Router       /api/modules/{module_uuid}/ [delete]
 func (routes *Routes) deleteModule(w http.ResponseWriter, r *http.Request) {
-	moduleUUID := r.PathValue("module_uuid")
-	if moduleUUID == "" {
-		w.WriteHeader(http.StatusBadRequest)
-
-		return
-	}
-
 	err := routes.modulesUC.DeleteModule(
 		r.Context(),
 		middleware.GetUserUUIDFromRequest(r),
-		moduleUUID,
+		r.PathValue("module_uuid"),
 	)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -213,22 +197,14 @@ func (routes *Routes) deleteModule(w http.ResponseWriter, r *http.Request) {
 // @Produce      json
 // @Param        module_uuid path string true "Module UUID"
 // @Success      200  {object}  entity.ModuleWithCards
-// @Failure      400
 // @Failure      404
 // @Failure      500
 // @Router       /api/modules/{module_uuid}/ [get]
 func (routes *Routes) getModuleWithCards(w http.ResponseWriter, r *http.Request) {
-	moduleUUID := r.PathValue("module_uuid")
-	if moduleUUID == "" {
-		w.WriteHeader(http.StatusBadRequest)
-
-		return
-	}
-
 	moduleWithCards, err := routes.modulesUC.GetModuleWithCards(
 		r.Context(),
 		middleware.GetUserUUIDFromRequest(r),
-		moduleUUID,
+		r.PathValue("module_uuid"),
 	)
 	if err != nil {
 		var notFoundErr *entity.ModuleNotFoundError

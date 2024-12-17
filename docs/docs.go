@@ -117,9 +117,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/entity.ModuleWithCards"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request"
-                    },
                     "404": {
                         "description": "Not Found"
                     },
@@ -202,9 +199,6 @@ const docTemplate = `{
                 "responses": {
                     "202": {
                         "description": "Accepted"
-                    },
-                    "400": {
-                        "description": "Bad Request"
                     },
                     "500": {
                         "description": "Internal Server Error"

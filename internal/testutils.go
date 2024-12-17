@@ -2,6 +2,7 @@ package testutils
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -60,4 +61,15 @@ func SendTestRequest(
 	require.NoError(t, err)
 
 	return res, b
+}
+
+func ToJSON(t *testing.T, m any) string {
+	t.Helper()
+
+	data, err := json.Marshal(m)
+	require.NoError(t, err)
+
+	data = append(data, '\n')
+
+	return string(data)
 }

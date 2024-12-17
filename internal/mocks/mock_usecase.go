@@ -110,6 +110,202 @@ func (mr *MockUserRepositoryMockRecorder) StoreUser(ctx, login, password any) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreUser", reflect.TypeOf((*MockUserRepository)(nil).StoreUser), ctx, login, password)
 }
 
+// MockModulesRepository is a mock of ModulesRepository interface.
+type MockModulesRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockModulesRepositoryMockRecorder
+	isgomock struct{}
+}
+
+// MockModulesRepositoryMockRecorder is the mock recorder for MockModulesRepository.
+type MockModulesRepositoryMockRecorder struct {
+	mock *MockModulesRepository
+}
+
+// NewMockModulesRepository creates a new mock instance.
+func NewMockModulesRepository(ctrl *gomock.Controller) *MockModulesRepository {
+	mock := &MockModulesRepository{ctrl: ctrl}
+	mock.recorder = &MockModulesRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockModulesRepository) EXPECT() *MockModulesRepositoryMockRecorder {
+	return m.recorder
+}
+
+// CreateNewModule mocks base method.
+func (m *MockModulesRepository) CreateNewModule(ctx context.Context, userUUID, moduleName string) (*entity.Module, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateNewModule", ctx, userUUID, moduleName)
+	ret0, _ := ret[0].(*entity.Module)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateNewModule indicates an expected call of CreateNewModule.
+func (mr *MockModulesRepositoryMockRecorder) CreateNewModule(ctx, userUUID, moduleName any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateNewModule", reflect.TypeOf((*MockModulesRepository)(nil).CreateNewModule), ctx, userUUID, moduleName)
+}
+
+// DeleteModule mocks base method.
+func (m *MockModulesRepository) DeleteModule(ctx context.Context, userUUID, moduleUUID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteModule", ctx, userUUID, moduleUUID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteModule indicates an expected call of DeleteModule.
+func (mr *MockModulesRepositoryMockRecorder) DeleteModule(ctx, userUUID, moduleUUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteModule", reflect.TypeOf((*MockModulesRepository)(nil).DeleteModule), ctx, userUUID, moduleUUID)
+}
+
+// GetAllModules mocks base method.
+func (m *MockModulesRepository) GetAllModules(ctx context.Context, userUUID string) ([]*entity.Module, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllModules", ctx, userUUID)
+	ret0, _ := ret[0].([]*entity.Module)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllModules indicates an expected call of GetAllModules.
+func (mr *MockModulesRepositoryMockRecorder) GetAllModules(ctx, userUUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllModules", reflect.TypeOf((*MockModulesRepository)(nil).GetAllModules), ctx, userUUID)
+}
+
+// GetModule mocks base method.
+func (m *MockModulesRepository) GetModule(ctx context.Context, userUUID, moduleUUID string) (*entity.Module, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetModule", ctx, userUUID, moduleUUID)
+	ret0, _ := ret[0].(*entity.Module)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetModule indicates an expected call of GetModule.
+func (mr *MockModulesRepositoryMockRecorder) GetModule(ctx, userUUID, moduleUUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetModule", reflect.TypeOf((*MockModulesRepository)(nil).GetModule), ctx, userUUID, moduleUUID)
+}
+
+// ModuleExists mocks base method.
+func (m *MockModulesRepository) ModuleExists(ctx context.Context, userUUID, moduleUUID string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ModuleExists", ctx, userUUID, moduleUUID)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ModuleExists indicates an expected call of ModuleExists.
+func (mr *MockModulesRepositoryMockRecorder) ModuleExists(ctx, userUUID, moduleUUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ModuleExists", reflect.TypeOf((*MockModulesRepository)(nil).ModuleExists), ctx, userUUID, moduleUUID)
+}
+
+// UpdateModule mocks base method.
+func (m *MockModulesRepository) UpdateModule(ctx context.Context, userUUID, moduleUUID, moduleName string) (*entity.Module, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateModule", ctx, userUUID, moduleUUID, moduleName)
+	ret0, _ := ret[0].(*entity.Module)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateModule indicates an expected call of UpdateModule.
+func (mr *MockModulesRepositoryMockRecorder) UpdateModule(ctx, userUUID, moduleUUID, moduleName any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateModule", reflect.TypeOf((*MockModulesRepository)(nil).UpdateModule), ctx, userUUID, moduleUUID, moduleName)
+}
+
+// MockCardsRepository is a mock of CardsRepository interface.
+type MockCardsRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockCardsRepositoryMockRecorder
+	isgomock struct{}
+}
+
+// MockCardsRepositoryMockRecorder is the mock recorder for MockCardsRepository.
+type MockCardsRepositoryMockRecorder struct {
+	mock *MockCardsRepository
+}
+
+// NewMockCardsRepository creates a new mock instance.
+func NewMockCardsRepository(ctrl *gomock.Controller) *MockCardsRepository {
+	mock := &MockCardsRepository{ctrl: ctrl}
+	mock.recorder = &MockCardsRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCardsRepository) EXPECT() *MockCardsRepositoryMockRecorder {
+	return m.recorder
+}
+
+// CreateCard mocks base method.
+func (m *MockCardsRepository) CreateCard(ctx context.Context, card *entity.Card) (*entity.Card, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateCard", ctx, card)
+	ret0, _ := ret[0].(*entity.Card)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateCard indicates an expected call of CreateCard.
+func (mr *MockCardsRepositoryMockRecorder) CreateCard(ctx, card any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCard", reflect.TypeOf((*MockCardsRepository)(nil).CreateCard), ctx, card)
+}
+
+// DeleteCard mocks base method.
+func (m *MockCardsRepository) DeleteCard(ctx context.Context, moduleUUID, cardUUID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCard", ctx, moduleUUID, cardUUID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCard indicates an expected call of DeleteCard.
+func (mr *MockCardsRepositoryMockRecorder) DeleteCard(ctx, moduleUUID, cardUUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCard", reflect.TypeOf((*MockCardsRepository)(nil).DeleteCard), ctx, moduleUUID, cardUUID)
+}
+
+// GetModuleCards mocks base method.
+func (m *MockCardsRepository) GetModuleCards(ctx context.Context, moduleUUID string) ([]*entity.Card, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetModuleCards", ctx, moduleUUID)
+	ret0, _ := ret[0].([]*entity.Card)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetModuleCards indicates an expected call of GetModuleCards.
+func (mr *MockCardsRepositoryMockRecorder) GetModuleCards(ctx, moduleUUID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetModuleCards", reflect.TypeOf((*MockCardsRepository)(nil).GetModuleCards), ctx, moduleUUID)
+}
+
+// SaveCard mocks base method.
+func (m *MockCardsRepository) SaveCard(ctx context.Context, card *entity.Card) (*entity.Card, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveCard", ctx, card)
+	ret0, _ := ret[0].(*entity.Card)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SaveCard indicates an expected call of SaveCard.
+func (mr *MockCardsRepositoryMockRecorder) SaveCard(ctx, card any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveCard", reflect.TypeOf((*MockCardsRepository)(nil).SaveCard), ctx, card)
+}
+
 // MockJWTIssuer is a mock of JWTIssuer interface.
 type MockJWTIssuer struct {
 	ctrl     *gomock.Controller
