@@ -57,17 +57,10 @@ func NewRoutes(
 
 func (routes *Routes) checkModuleMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		moduleUUID := r.PathValue("module_uuid")
-		if moduleUUID == "" {
-			w.WriteHeader(http.StatusBadRequest)
-
-			return
-		}
-
 		isModuleExists, err := routes.modulesUC.ModuleExists(
 			r.Context(),
 			middleware.GetUserUUIDFromRequest(r),
-			moduleUUID,
+			r.PathValue("module_uuid"),
 		)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -179,11 +172,6 @@ func (routes *Routes) addCard(w http.ResponseWriter, r *http.Request) {
 // @Router       /api/modules/{module_uuid}/cards/{card_uuid} [put]
 func (routes *Routes) updateCard(w http.ResponseWriter, r *http.Request) {
 	cardUUID := r.PathValue("card_uuid")
-	if cardUUID == "" {
-		w.WriteHeader(http.StatusBadRequest)
-
-		return
-	}
 
 	var req updateCardRequest
 
@@ -237,14 +225,7 @@ func (routes *Routes) updateCard(w http.ResponseWriter, r *http.Request) {
 // @Failure      500
 // @Router       /api/modules/{module_uuid}/cards/{card_uuid} [delete]
 func (routes *Routes) deleteCard(w http.ResponseWriter, r *http.Request) {
-	cardUUID := r.PathValue("card_uuid")
-	if cardUUID == "" {
-		w.WriteHeader(http.StatusBadRequest)
-
-		return
-	}
-
-	err := routes.cardsUC.DeleteCard(r.Context(), r.PathValue("module_uuid"), cardUUID)
+	err := routes.cardsUC.DeleteCard(r.Context(), r.PathValue("module_uuid"), r.PathValue("card_uuid"))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		routes.log.Error().Err(err).Msg("card deleting failed")
