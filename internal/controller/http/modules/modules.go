@@ -20,10 +20,16 @@ type modulesUseCase interface {
 	CreateNewModule(ctx context.Context, userUUID string, moduleName string) (*entity.Module, error)
 	UpdateModule(ctx context.Context, userUUID string, moduleUUID string, moduleName string) (*entity.Module, error)
 	DeleteModule(ctx context.Context, userUUID string, moduleUUID string) error
+	ImportModuleFromQuizlet(ctx context.Context, userUUID string, moduleName string, quizletModuleID string)
 }
 
 type createOrUpdateModuleRequest struct {
 	Name string `json:"name" validate:"required,max=100"`
+}
+
+type quizletImportRequest struct {
+	ModuleName      string `json:"module_name"       validate:"required,max=100"`
+	QuizletModuleID string `json:"quizlet_module_id" validate:"required"`
 }
 
 type Routes struct {
@@ -111,6 +117,41 @@ func (routes *Routes) createModule(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 
 	routes.jsonResponse(w, module)
+}
+
+// Swagger spec:
+// @Summary      Get module with cards
+// @Security     UsersAuth
+// @Tags         modules
+// @Accept       json
+// @Param        request body quizletImportRequest true "Import module params"
+// @Success      200
+// @Failure      400
+// @Router       /api/modules/import/quizlet [post]
+func (routes *Routes) importModuleFromQuizlet(w http.ResponseWriter, r *http.Request) {
+	var req quizletImportRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+
+		return
+	}
+
+	req.ModuleName = strings.TrimSpace(req.ModuleName)
+	req.QuizletModuleID = strings.TrimSpace(req.QuizletModuleID)
+
+	if err := routes.validator.Struct(req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+	routes.modulesUC.ImportModuleFromQuizlet(
+		r.Context(),
+		middleware.GetUserUUIDFromRequest(r),
+		req.ModuleName,
+		req.QuizletModuleID,
+	)
 }
 
 // Swagger spec:
@@ -227,6 +268,10 @@ func (routes *Routes) Apply(r chi.Router) {
 	r.Route("/api/modules", func(r chi.Router) {
 		r.Get("/", routes.getAllModules)
 		r.Post("/", routes.createModule)
+
+		r.Route("/import", func(r chi.Router) {
+			r.Post("/quizlet", routes.importModuleFromQuizlet)
+		})
 
 		r.Route("/{module_uuid}", func(r chi.Router) {
 			r.Get("/", routes.getModuleWithCards)

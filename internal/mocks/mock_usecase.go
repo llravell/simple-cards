@@ -15,6 +15,7 @@ import (
 	time "time"
 
 	entity "github.com/llravell/simple-cards/internal/entity"
+	quizlet "github.com/llravell/simple-cards/pkg/quizlet"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -147,6 +148,20 @@ func (m *MockModulesRepository) CreateNewModule(ctx context.Context, userUUID, m
 func (mr *MockModulesRepositoryMockRecorder) CreateNewModule(ctx, userUUID, moduleName any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateNewModule", reflect.TypeOf((*MockModulesRepository)(nil).CreateNewModule), ctx, userUUID, moduleName)
+}
+
+// CreateNewModuleWithCards mocks base method.
+func (m *MockModulesRepository) CreateNewModuleWithCards(ctx context.Context, moduleWithCards *entity.ModuleWithCards) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateNewModuleWithCards", ctx, moduleWithCards)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateNewModuleWithCards indicates an expected call of CreateNewModuleWithCards.
+func (mr *MockModulesRepositoryMockRecorder) CreateNewModuleWithCards(ctx, moduleWithCards any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateNewModuleWithCards", reflect.TypeOf((*MockModulesRepository)(nil).CreateNewModuleWithCards), ctx, moduleWithCards)
 }
 
 // DeleteModule mocks base method.
@@ -343,4 +358,43 @@ func (m *MockJWTIssuer) Issue(userUUID string, ttl time.Duration) (string, error
 func (mr *MockJWTIssuerMockRecorder) Issue(userUUID, ttl any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Issue", reflect.TypeOf((*MockJWTIssuer)(nil).Issue), userUUID, ttl)
+}
+
+// MockQuizletModuleParser is a mock of QuizletModuleParser interface.
+type MockQuizletModuleParser struct {
+	ctrl     *gomock.Controller
+	recorder *MockQuizletModuleParserMockRecorder
+	isgomock struct{}
+}
+
+// MockQuizletModuleParserMockRecorder is the mock recorder for MockQuizletModuleParser.
+type MockQuizletModuleParserMockRecorder struct {
+	mock *MockQuizletModuleParser
+}
+
+// NewMockQuizletModuleParser creates a new mock instance.
+func NewMockQuizletModuleParser(ctrl *gomock.Controller) *MockQuizletModuleParser {
+	mock := &MockQuizletModuleParser{ctrl: ctrl}
+	mock.recorder = &MockQuizletModuleParserMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockQuizletModuleParser) EXPECT() *MockQuizletModuleParserMockRecorder {
+	return m.recorder
+}
+
+// Parse mocks base method.
+func (m *MockQuizletModuleParser) Parse(moduleID string) ([]quizlet.Card, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Parse", moduleID)
+	ret0, _ := ret[0].([]quizlet.Card)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Parse indicates an expected call of Parse.
+func (mr *MockQuizletModuleParserMockRecorder) Parse(moduleID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Parse", reflect.TypeOf((*MockQuizletModuleParser)(nil).Parse), moduleID)
 }

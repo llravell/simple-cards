@@ -37,8 +37,9 @@ var testCard = entity.Card{
 func prepareTestServer(
 	modulesRepo usecase.ModulesRepository,
 	cardsRepo usecase.CardsRepository,
+	quizletModuleParser usecase.QuizletModuleParser,
 ) *httptest.Server {
-	modulesUseCase := usecase.NewModulesUseCase(modulesRepo, cardsRepo)
+	modulesUseCase := usecase.NewModulesUseCase(modulesRepo, cardsRepo, quizletModuleParser)
 	cardsUseCase := usecase.NewCardsUseCase(cardsRepo)
 	router := chi.NewRouter()
 	routes := cards.NewRoutes(modulesUseCase, cardsUseCase, zerolog.Nop())
@@ -52,7 +53,8 @@ func prepareTestServer(
 func TestGetCards(t *testing.T) {
 	modulesRepo := mocks.NewMockModulesRepository(gomock.NewController(t))
 	cardsRepo := mocks.NewMockCardsRepository(gomock.NewController(t))
-	ts := prepareTestServer(modulesRepo, cardsRepo)
+	quizletModuleParser := mocks.NewMockQuizletModuleParser(gomock.NewController(t))
+	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser)
 
 	defer ts.Close()
 
@@ -127,7 +129,8 @@ func TestGetCards(t *testing.T) {
 func TestAddCard(t *testing.T) {
 	modulesRepo := mocks.NewMockModulesRepository(gomock.NewController(t))
 	cardsRepo := mocks.NewMockCardsRepository(gomock.NewController(t))
-	ts := prepareTestServer(modulesRepo, cardsRepo)
+	quizletModuleParser := mocks.NewMockQuizletModuleParser(gomock.NewController(t))
+	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser)
 
 	defer ts.Close()
 
@@ -246,7 +249,8 @@ func TestAddCard(t *testing.T) {
 func TestUpdateCard(t *testing.T) {
 	modulesRepo := mocks.NewMockModulesRepository(gomock.NewController(t))
 	cardsRepo := mocks.NewMockCardsRepository(gomock.NewController(t))
-	ts := prepareTestServer(modulesRepo, cardsRepo)
+	quizletModuleParser := mocks.NewMockQuizletModuleParser(gomock.NewController(t))
+	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser)
 
 	defer ts.Close()
 
@@ -369,7 +373,8 @@ func TestUpdateCard(t *testing.T) {
 func TestDeleteCard(t *testing.T) {
 	modulesRepo := mocks.NewMockModulesRepository(gomock.NewController(t))
 	cardsRepo := mocks.NewMockCardsRepository(gomock.NewController(t))
-	ts := prepareTestServer(modulesRepo, cardsRepo)
+	quizletModuleParser := mocks.NewMockQuizletModuleParser(gomock.NewController(t))
+	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser)
 
 	defer ts.Close()
 

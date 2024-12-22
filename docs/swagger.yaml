@@ -70,6 +70,17 @@ definitions:
     required:
     - name
     type: object
+  modules.quizletImportRequest:
+    properties:
+      module_name:
+        maxLength: 100
+        type: string
+      quizlet_module_id:
+        type: string
+    required:
+    - module_name
+    - quizlet_module_id
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -320,6 +331,27 @@ paths:
       summary: Update card
       tags:
       - cards
+  /api/modules/import/quizlet:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Import module params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/modules.quizletImportRequest'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      security:
+      - UsersAuth: []
+      summary: Get module with cards
+      tags:
+      - modules
   /api/user/login:
     post:
       consumes:

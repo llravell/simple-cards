@@ -11,6 +11,7 @@ import (
 	"github.com/llravell/simple-cards/internal/usecase"
 	"github.com/llravell/simple-cards/logger"
 	"github.com/llravell/simple-cards/pkg/auth"
+	"github.com/llravell/simple-cards/pkg/quizlet"
 )
 
 func main() {
@@ -29,7 +30,12 @@ func main() {
 		defer db.Close()
 	}
 
-	log := logger.Get()
+	quizletParser, err := quizlet.NewParser()
+	if err != nil {
+		log.Fatalf("quizlet parser initialize error: %s", err)
+	}
+
+	logger := logger.Get()
 
 	usersRepository := repository.NewUsersRepository(db)
 	modulesRepository := repository.NewModulesRepository(db)
@@ -37,7 +43,7 @@ func main() {
 	jwtManager := auth.NewJWTManager(cfg.JWTSecret)
 	healthUseCase := usecase.NewHealthUseCase(db)
 	authUseCase := usecase.NewAuthUseCase(usersRepository, jwtManager)
-	modulesUseCase := usecase.NewModulesUseCase(modulesRepository, cardsRepository)
+	modulesUseCase := usecase.NewModulesUseCase(modulesRepository, cardsRepository, quizletParser)
 	cardsUseCase := usecase.NewCardsUseCase(cardsRepository)
 
 	app.New(
@@ -46,7 +52,7 @@ func main() {
 		modulesUseCase,
 		cardsUseCase,
 		jwtManager,
-		log,
+		logger,
 		app.Addr(cfg.Addr),
 	).Run()
 }

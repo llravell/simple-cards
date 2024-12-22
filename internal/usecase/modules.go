@@ -7,14 +7,20 @@ import (
 )
 
 type ModulesUseCase struct {
-	modulesRepo ModulesRepository
-	cardsRepo   CardsRepository
+	modulesRepo         ModulesRepository
+	cardsRepo           CardsRepository
+	quizletModuleParser QuizletModuleParser
 }
 
-func NewModulesUseCase(modulesRepo ModulesRepository, cardsRepo CardsRepository) *ModulesUseCase {
+func NewModulesUseCase(
+	modulesRepo ModulesRepository,
+	cardsRepo CardsRepository,
+	quizletModuleParser QuizletModuleParser,
+) *ModulesUseCase {
 	return &ModulesUseCase{
-		modulesRepo: modulesRepo,
-		cardsRepo:   cardsRepo,
+		modulesRepo:         modulesRepo,
+		cardsRepo:           cardsRepo,
+		quizletModuleParser: quizletModuleParser,
 	}
 }
 
@@ -70,4 +76,44 @@ func (uc *ModulesUseCase) GetModuleWithCards(
 		Module: *module,
 		Cards:  cards,
 	}, nil
+}
+
+func (uc *ModulesUseCase) ImportModuleFromQuizlet(
+	ctx context.Context,
+	userUUID string,
+	moduleName string,
+	quizletModuleID string,
+) {
+	quizletCards, err := uc.quizletModuleParser.Parse(quizletModuleID)
+	if err != nil {
+		return
+	}
+
+	if len(quizletCards) == 0 {
+		return
+	}
+
+	module := entity.Module{
+		Name:     moduleName,
+		UserUUID: userUUID,
+	}
+
+	moduleCards := make([]*entity.Card, 0, len(quizletCards))
+
+	for _, quizletCard := range quizletCards {
+		card := &entity.Card{
+			Term:    quizletCard.Front,
+			Meaning: quizletCard.Back,
+		}
+
+		moduleCards = append(moduleCards, card)
+	}
+
+	uc.modulesRepo.CreateNewModuleWithCards(
+		ctx,
+		&entity.ModuleWithCards{
+			Module: module,
+			Cards:  moduleCards,
+		},
+	)
 }

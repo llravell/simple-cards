@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/llravell/simple-cards/internal/entity"
+	"github.com/llravell/simple-cards/pkg/quizlet"
 )
 
 //go:generate ../../bin/mockgen -source=interfaces.go -destination=../mocks/mock_usecase.go -package=mocks
@@ -23,6 +24,7 @@ type (
 		GetAllModules(ctx context.Context, userUUID string) ([]*entity.Module, error)
 		GetModule(ctx context.Context, userUUID string, moduleUUID string) (*entity.Module, error)
 		CreateNewModule(ctx context.Context, userUUID string, moduleName string) (*entity.Module, error)
+		CreateNewModuleWithCards(ctx context.Context, moduleWithCards *entity.ModuleWithCards) error
 		UpdateModule(ctx context.Context, userUUID string, moduleUUID string, moduleName string) (*entity.Module, error)
 		DeleteModule(ctx context.Context, userUUID string, moduleUUID string) error
 		ModuleExists(ctx context.Context, userUUID string, moduleUUID string) (bool, error)
@@ -37,5 +39,9 @@ type (
 
 	JWTIssuer interface {
 		Issue(userUUID string, ttl time.Duration) (string, error)
+	}
+
+	QuizletModuleParser interface {
+		Parse(moduleID string) ([]quizlet.Card, error)
 	}
 )

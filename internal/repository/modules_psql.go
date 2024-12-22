@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/llravell/simple-cards/internal/entity"
 )
@@ -75,6 +77,55 @@ func (repo *ModulesRepository) CreateNewModule(
 	}
 
 	return &module, nil
+}
+
+func (repo *ModulesRepository) CreateNewModuleWithCards(
+	ctx context.Context,
+	moduleWithCards *entity.ModuleWithCards,
+) error {
+	tx, err := repo.conn.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	row := tx.QueryRowContext(ctx, `
+		INSERT INTO modules (name, user_uuid)
+		VALUES ($1, $2)
+		RETURNING uuid;
+	`, moduleWithCards.Name, moduleWithCards.UserUUID)
+
+	err = row.Scan(&moduleWithCards.UUID)
+	if err != nil {
+		tx.Rollback()
+
+		return err
+	}
+
+	insertColsAmount := 3
+	insertParts := make([]string, 0, len(moduleWithCards.Cards))
+	args := make([]any, 0, len(moduleWithCards.Cards)*insertColsAmount)
+
+	for i, card := range moduleWithCards.Cards {
+		base := i * insertColsAmount
+		part := fmt.Sprintf("($%d, $%d, $%d)", base+1, base+2, base+3)
+
+		insertParts = append(insertParts, part)
+		args = append(args, moduleWithCards.UUID, card.Term, card.Meaning)
+	}
+
+	query := fmt.Sprintf(`
+		INSERT INTO cards (module_uuid, term, meaning)
+		VALUES %s;
+	`, strings.Join(insertParts, ","))
+
+	_, err = tx.ExecContext(ctx, query, args...)
+	if err != nil {
+		tx.Rollback()
+
+		return err
+	}
+
+	return tx.Commit()
 }
 
 func (repo *ModulesRepository) UpdateModule(

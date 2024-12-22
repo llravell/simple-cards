@@ -87,6 +87,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/modules/import/quizlet": {
+            "post": {
+                "security": [
+                    {
+                        "UsersAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "modules"
+                ],
+                "summary": "Get module with cards",
+                "parameters": [
+                    {
+                        "description": "Import module params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/modules.quizletImportRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
         "/api/modules/{module_uuid}/": {
             "get": {
                 "security": [
@@ -606,6 +641,22 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "maxLength": 100
+                }
+            }
+        },
+        "modules.quizletImportRequest": {
+            "type": "object",
+            "required": [
+                "module_name",
+                "quizlet_module_id"
+            ],
+            "properties": {
+                "module_name": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "quizlet_module_id": {
+                    "type": "string"
                 }
             }
         }
