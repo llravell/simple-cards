@@ -13,6 +13,7 @@ linters:
     - paralleltest
     - ireturn
     - testifylint
+    - err113
 
 linters-settings:
   depguard:
@@ -31,3 +32,10 @@ linters-settings:
       - w http.ResponseWriter
       - r *http.Request
       - r chi.Router
+
+  godot:
+    period: false
+
+  mnd:
+    ignored-files:
+      - '.+_psql.go'

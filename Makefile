@@ -3,6 +3,10 @@ export
 
 LOCAL_BIN ?= $(CURDIR)/bin
 
+.PHONY: run
+run: ### run app
+	go run cmd/simplecards/main.go
+
 .PHONY: lint
 lint: ### run linter
 	golangci-lint run ./...
@@ -14,6 +18,10 @@ test: ### run tests
 .PHONY: migrate-up
 migrate-up: ### run migrations
 	bin/goose up
+
+.PHONY: swag
+swag:
+	swag init -g internal/app/app.go
 
 .PHONY: reqs
 reqs: ### install binary deps to bin/
