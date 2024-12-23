@@ -31,7 +31,7 @@ type studiableItemCardSide struct {
 	Label cardSideLabel `json:"label"`
 	Media []struct {
 		PlainText string `json:"plainText"`
-	}
+	} `json:"media"`
 }
 
 type ModuleFetchingError struct {

@@ -1,6 +1,7 @@
 package quizlet
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -32,20 +33,23 @@ func NewParser() (*Parser, error) {
 	}, nil
 }
 
-func (p *Parser) fetchStudiableItems(moduleID string, attempts int) (*studiableItemsResponse, error) {
+func (p *Parser) fetchStudiableItems(
+	ctx context.Context,
+	moduleID string,
+	attempts int,
+) (*studiableItemsResponse, error) {
 	query := fmt.Sprintf(
 		"filters[studiableContainerId]=%s&filters[studiableContainerType]=1&perPage=1000&page=1",
 		moduleID,
 	)
 	studiableItemsURL := fmt.Sprintf("%s/studiable-item-documents?%s", baseQuizletURL, query)
-	fmt.Println(studiableItemsURL)
 
-	req, err := http.NewRequest(http.MethodGet, studiableItemsURL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, studiableItemsURL, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Set("user-agent", defaultUserAgent)
+	req.Header.Set("User-Agent", defaultUserAgent)
 
 	resp, err := p.client.Do(req)
 	if err != nil {
@@ -60,7 +64,7 @@ func (p *Parser) fetchStudiableItems(moduleID string, attempts int) (*studiableI
 		resp.Body.Close()
 		time.Sleep(sleepDurationBeforeAttempt)
 
-		return p.fetchStudiableItems(moduleID, attempts-1)
+		return p.fetchStudiableItems(ctx, moduleID, attempts-1)
 	}
 
 	defer resp.Body.Close()
@@ -74,10 +78,10 @@ func (p *Parser) fetchStudiableItems(moduleID string, attempts int) (*studiableI
 	return &studiableItemsResponse, nil
 }
 
-func (p *Parser) Parse(moduleID string) ([]Card, error) {
+func (p *Parser) Parse(ctx context.Context, moduleID string) ([]Card, error) {
 	var cards []Card
 
-	studiableItemsResponse, err := p.fetchStudiableItems(moduleID, fetchModuleAttempts)
+	studiableItemsResponse, err := p.fetchStudiableItems(ctx, moduleID, fetchModuleAttempts)
 	if err != nil {
 		return cards, err
 	}

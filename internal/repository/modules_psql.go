@@ -96,7 +96,10 @@ func (repo *ModulesRepository) CreateNewModuleWithCards(
 
 	err = row.Scan(&moduleWithCards.UUID)
 	if err != nil {
-		tx.Rollback()
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return rollbackErr
+		}
 
 		return err
 	}
@@ -113,6 +116,7 @@ func (repo *ModulesRepository) CreateNewModuleWithCards(
 		args = append(args, moduleWithCards.UUID, card.Term, card.Meaning)
 	}
 
+	//nolint:gosec
 	query := fmt.Sprintf(`
 		INSERT INTO cards (module_uuid, term, meaning)
 		VALUES %s;
@@ -120,7 +124,10 @@ func (repo *ModulesRepository) CreateNewModuleWithCards(
 
 	_, err = tx.ExecContext(ctx, query, args...)
 	if err != nil {
-		tx.Rollback()
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return rollbackErr
+		}
 
 		return err
 	}

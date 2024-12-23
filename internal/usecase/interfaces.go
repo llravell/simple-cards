@@ -42,6 +42,6 @@ type (
 	}
 
 	QuizletModuleParser interface {
-		Parse(moduleID string) ([]quizlet.Card, error)
+		Parse(ctx context.Context, moduleID string) ([]quizlet.Card, error)
 	}
 )

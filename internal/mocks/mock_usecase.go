@@ -385,16 +385,16 @@ func (m *MockQuizletModuleParser) EXPECT() *MockQuizletModuleParserMockRecorder 
 }
 
 // Parse mocks base method.
-func (m *MockQuizletModuleParser) Parse(moduleID string) ([]quizlet.Card, error) {
+func (m *MockQuizletModuleParser) Parse(ctx context.Context, moduleID string) ([]quizlet.Card, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Parse", moduleID)
+	ret := m.ctrl.Call(m, "Parse", ctx, moduleID)
 	ret0, _ := ret[0].([]quizlet.Card)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Parse indicates an expected call of Parse.
-func (mr *MockQuizletModuleParserMockRecorder) Parse(moduleID any) *gomock.Call {
+func (mr *MockQuizletModuleParserMockRecorder) Parse(ctx, moduleID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Parse", reflect.TypeOf((*MockQuizletModuleParser)(nil).Parse), moduleID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Parse", reflect.TypeOf((*MockQuizletModuleParser)(nil).Parse), ctx, moduleID)
 }

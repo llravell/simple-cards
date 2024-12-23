@@ -20,7 +20,7 @@ type modulesUseCase interface {
 	CreateNewModule(ctx context.Context, userUUID string, moduleName string) (*entity.Module, error)
 	UpdateModule(ctx context.Context, userUUID string, moduleUUID string, moduleName string) (*entity.Module, error)
 	DeleteModule(ctx context.Context, userUUID string, moduleUUID string) error
-	ImportModuleFromQuizlet(ctx context.Context, userUUID string, moduleName string, quizletModuleID string)
+	QueueQuizletModuleImport(module *entity.Module, quizletModuleID string) error
 }
 
 type createOrUpdateModuleRequest struct {
@@ -127,6 +127,7 @@ func (routes *Routes) createModule(w http.ResponseWriter, r *http.Request) {
 // @Param        request body quizletImportRequest true "Import module params"
 // @Success      200
 // @Failure      400
+// @Failure      500
 // @Router       /api/modules/import/quizlet [post]
 func (routes *Routes) importModuleFromQuizlet(w http.ResponseWriter, r *http.Request) {
 	var req quizletImportRequest
@@ -146,12 +147,18 @@ func (routes *Routes) importModuleFromQuizlet(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	routes.modulesUC.ImportModuleFromQuizlet(
-		r.Context(),
-		middleware.GetUserUUIDFromRequest(r),
-		req.ModuleName,
-		req.QuizletModuleID,
-	)
+	module := &entity.Module{
+		UserUUID: middleware.GetUserUUIDFromRequest(r),
+		Name:     req.ModuleName,
+	}
+
+	err := routes.modulesUC.QueueQuizletModuleImport(module, req.QuizletModuleID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		routes.log.Error().Err(err).Msg("quizlet module import queue failed")
+
+		return
+	}
 }
 
 // Swagger spec:

@@ -38,11 +38,20 @@ func prepareTestServer(
 	modulesRepo usecase.ModulesRepository,
 	cardsRepo usecase.CardsRepository,
 	quizletModuleParser usecase.QuizletModuleParser,
+	quizletImportWP usecase.QuizletImportWorkerPool,
 ) *httptest.Server {
-	modulesUseCase := usecase.NewModulesUseCase(modulesRepo, cardsRepo, quizletModuleParser)
+	log := zerolog.Nop()
+
+	modulesUseCase := usecase.NewModulesUseCase(
+		modulesRepo,
+		cardsRepo,
+		quizletModuleParser,
+		quizletImportWP,
+		&log,
+	)
 	cardsUseCase := usecase.NewCardsUseCase(cardsRepo)
 	router := chi.NewRouter()
-	routes := cards.NewRoutes(modulesUseCase, cardsUseCase, zerolog.Nop())
+	routes := cards.NewRoutes(modulesUseCase, cardsUseCase, log)
 
 	routes.Apply(router)
 
@@ -54,7 +63,9 @@ func TestGetCards(t *testing.T) {
 	modulesRepo := mocks.NewMockModulesRepository(gomock.NewController(t))
 	cardsRepo := mocks.NewMockCardsRepository(gomock.NewController(t))
 	quizletModuleParser := mocks.NewMockQuizletModuleParser(gomock.NewController(t))
-	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser)
+	quizletImportWP := mocks.NewMockQuizletImportWorkerPool(gomock.NewController(t))
+
+	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser, quizletImportWP)
 
 	defer ts.Close()
 
@@ -130,7 +141,9 @@ func TestAddCard(t *testing.T) {
 	modulesRepo := mocks.NewMockModulesRepository(gomock.NewController(t))
 	cardsRepo := mocks.NewMockCardsRepository(gomock.NewController(t))
 	quizletModuleParser := mocks.NewMockQuizletModuleParser(gomock.NewController(t))
-	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser)
+	quizletImportWP := mocks.NewMockQuizletImportWorkerPool(gomock.NewController(t))
+
+	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser, quizletImportWP)
 
 	defer ts.Close()
 
@@ -250,7 +263,9 @@ func TestUpdateCard(t *testing.T) {
 	modulesRepo := mocks.NewMockModulesRepository(gomock.NewController(t))
 	cardsRepo := mocks.NewMockCardsRepository(gomock.NewController(t))
 	quizletModuleParser := mocks.NewMockQuizletModuleParser(gomock.NewController(t))
-	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser)
+	quizletImportWP := mocks.NewMockQuizletImportWorkerPool(gomock.NewController(t))
+
+	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser, quizletImportWP)
 
 	defer ts.Close()
 
@@ -374,7 +389,9 @@ func TestDeleteCard(t *testing.T) {
 	modulesRepo := mocks.NewMockModulesRepository(gomock.NewController(t))
 	cardsRepo := mocks.NewMockCardsRepository(gomock.NewController(t))
 	quizletModuleParser := mocks.NewMockQuizletModuleParser(gomock.NewController(t))
-	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser)
+	quizletImportWP := mocks.NewMockQuizletImportWorkerPool(gomock.NewController(t))
+
+	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser, quizletImportWP)
 
 	defer ts.Close()
 
