@@ -331,6 +331,28 @@ paths:
       summary: Update card
       tags:
       - cards
+  /api/modules/{module_uuid}/export/csv:
+    get:
+      parameters:
+      - description: Module UUID
+        in: path
+        name: module_uuid
+        required: true
+        type: string
+      produces:
+      - text/csv
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - UsersAuth: []
+      summary: Export module to csv file
+      tags:
+      - modules
   /api/modules/import/csv:
     post:
       consumes:

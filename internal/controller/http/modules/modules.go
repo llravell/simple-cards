@@ -2,8 +2,10 @@ package modules
 
 import (
 	"context"
+	"encoding/csv"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"path/filepath"
@@ -16,10 +18,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-const (
-	maxCSVImportFileSize = 1 << 20
-	fileHeaderSize       = 1 << 20
-)
+const maxCSVImportFileSize = 1 << 20
 
 type modulesUseCase interface {
 	GetAllModules(ctx context.Context, userUUID string) ([]*entity.Module, error)
@@ -322,6 +321,59 @@ func (routes *Routes) getModuleWithCards(w http.ResponseWriter, r *http.Request)
 	routes.jsonResponse(w, moduleWithCards)
 }
 
+// Swagger spec:
+// @Summary      Export module to csv file
+// @Security     UsersAuth
+// @Tags         modules
+// @Param        module_uuid path string true "Module UUID"
+// @Produce      text/csv
+// @Success      200
+// @Failure      404
+// @Failure      500
+// @Router       /api/modules/{module_uuid}/export/csv [get]
+func (routes *Routes) exportModuleToCSV(w http.ResponseWriter, r *http.Request) {
+	moduleWithCards, err := routes.modulesUC.GetModuleWithCards(
+		r.Context(),
+		middleware.GetUserUUIDFromRequest(r),
+		r.PathValue("module_uuid"),
+	)
+	if err != nil {
+		var notFoundErr *entity.ModuleNotFoundError
+
+		if errors.As(err, &notFoundErr) {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+
+		routes.log.Error().Err(err).Msg("module searching failed")
+
+		return
+	}
+
+	fileName := fmt.Sprintf("%s.%s", moduleWithCards.Name, "csv")
+
+	w.Header().Set("Content-Type", "text/csv")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", fileName))
+
+	csvRecords := make([][]string, 0)
+
+	for _, card := range moduleWithCards.Cards {
+		record := []string{card.Term, card.Meaning}
+		csvRecords = append(csvRecords, record)
+	}
+
+	csvWritter := csv.NewWriter(w)
+
+	err = csvWritter.WriteAll(csvRecords)
+	if err != nil {
+		routes.log.Error().Err(err).Msg("csv writing failed")
+		w.WriteHeader(http.StatusInternalServerError)
+
+		return
+	}
+}
+
 func (routes *Routes) Apply(r chi.Router) {
 	r.Route("/api/modules", func(r chi.Router) {
 		r.Get("/", routes.getAllModules)
@@ -336,6 +388,10 @@ func (routes *Routes) Apply(r chi.Router) {
 			r.Get("/", routes.getModuleWithCards)
 			r.Put("/", routes.updateModule)
 			r.Delete("/", routes.deleteModule)
+
+			r.Route("/export", func(r chi.Router) {
+				r.Get("/csv", routes.exportModuleToCSV)
+			})
 		})
 	})
 }

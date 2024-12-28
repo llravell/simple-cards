@@ -479,6 +479,42 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/modules/{module_uuid}/export/csv": {
+            "get": {
+                "security": [
+                    {
+                        "UsersAuth": []
+                    }
+                ],
+                "produces": [
+                    "text/csv"
+                ],
+                "tags": [
+                    "modules"
+                ],
+                "summary": "Export module to csv file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Module UUID",
+                        "name": "module_uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/api/user/login": {
             "post": {
                 "consumes": [
