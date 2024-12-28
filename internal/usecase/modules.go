@@ -2,68 +2,18 @@ package usecase
 
 import (
 	"context"
+	"io"
 
 	"github.com/llravell/simple-cards/internal/entity"
 	"github.com/rs/zerolog"
 )
-
-//go:generate ../../bin/mockgen -source=modules.go -destination=../mocks/mock_modules_usecase.go -package=mocks
-type QuizletImportWorkerPool interface {
-	QueueWork(w *QuizletImportWork) error
-}
-
-type QuizletImportWork struct {
-	repo                ModulesRepository
-	quizletModuleParser QuizletModuleParser
-	log                 *zerolog.Logger
-	module              *entity.Module
-	quizletModuleID     string
-}
-
-func (w *QuizletImportWork) Do(ctx context.Context) {
-	quizletCards, err := w.quizletModuleParser.Parse(ctx, w.quizletModuleID)
-	if err != nil {
-		w.log.Error().Err(err).Msg("quizlet module parsing failed")
-
-		return
-	}
-
-	if len(quizletCards) == 0 {
-		return
-	}
-
-	w.log.Info().Msgf("quizlet module \"%s\" parsed", w.quizletModuleID)
-
-	moduleCards := make([]*entity.Card, 0, len(quizletCards))
-
-	for _, quizletCard := range quizletCards {
-		card := &entity.Card{
-			Term:    quizletCard.Front,
-			Meaning: quizletCard.Back,
-		}
-
-		moduleCards = append(moduleCards, card)
-	}
-
-	err = w.repo.CreateNewModuleWithCards(
-		ctx,
-		&entity.ModuleWithCards{
-			Module: *w.module,
-			Cards:  moduleCards,
-		},
-	)
-	if err != nil {
-		w.log.Error().Err(err).Msg("module from quizlet storing failed")
-	} else {
-		w.log.Info().Msgf("quizlet module \"%s\" imported", w.quizletModuleID)
-	}
-}
 
 type ModulesUseCase struct {
 	modulesRepo         ModulesRepository
 	cardsRepo           CardsRepository
 	quizletModuleParser QuizletModuleParser
 	quizletImportWP     QuizletImportWorkerPool
+	csvImportWP         CSVImportWorkerPool
 	log                 *zerolog.Logger
 }
 
@@ -72,6 +22,7 @@ func NewModulesUseCase(
 	cardsRepo CardsRepository,
 	quizletModuleParser QuizletModuleParser,
 	quizletImportWP QuizletImportWorkerPool,
+	csvImportWP CSVImportWorkerPool,
 	log *zerolog.Logger,
 ) *ModulesUseCase {
 	return &ModulesUseCase{
@@ -79,6 +30,7 @@ func NewModulesUseCase(
 		cardsRepo:           cardsRepo,
 		quizletModuleParser: quizletModuleParser,
 		quizletImportWP:     quizletImportWP,
+		csvImportWP:         csvImportWP,
 		log:                 log,
 	}
 }
@@ -150,4 +102,18 @@ func (uc *ModulesUseCase) QueueQuizletModuleImport(
 	}
 
 	return uc.quizletImportWP.QueueWork(importWork)
+}
+
+func (uc *ModulesUseCase) QueueCSVModuleImport(
+	module *entity.Module,
+	reader io.ReadCloser,
+) error {
+	importWork := &CSVImportWork{
+		repo:   uc.modulesRepo,
+		log:    uc.log,
+		module: module,
+		reader: reader,
+	}
+
+	return uc.csvImportWP.QueueWork(importWork)
 }

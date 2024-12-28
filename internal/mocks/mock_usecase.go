@@ -15,6 +15,7 @@ import (
 	time "time"
 
 	entity "github.com/llravell/simple-cards/internal/entity"
+	usecase "github.com/llravell/simple-cards/internal/usecase"
 	quizlet "github.com/llravell/simple-cards/pkg/quizlet"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -397,4 +398,80 @@ func (m *MockQuizletModuleParser) Parse(ctx context.Context, moduleID string) ([
 func (mr *MockQuizletModuleParserMockRecorder) Parse(ctx, moduleID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Parse", reflect.TypeOf((*MockQuizletModuleParser)(nil).Parse), ctx, moduleID)
+}
+
+// MockQuizletImportWorkerPool is a mock of QuizletImportWorkerPool interface.
+type MockQuizletImportWorkerPool struct {
+	ctrl     *gomock.Controller
+	recorder *MockQuizletImportWorkerPoolMockRecorder
+	isgomock struct{}
+}
+
+// MockQuizletImportWorkerPoolMockRecorder is the mock recorder for MockQuizletImportWorkerPool.
+type MockQuizletImportWorkerPoolMockRecorder struct {
+	mock *MockQuizletImportWorkerPool
+}
+
+// NewMockQuizletImportWorkerPool creates a new mock instance.
+func NewMockQuizletImportWorkerPool(ctrl *gomock.Controller) *MockQuizletImportWorkerPool {
+	mock := &MockQuizletImportWorkerPool{ctrl: ctrl}
+	mock.recorder = &MockQuizletImportWorkerPoolMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockQuizletImportWorkerPool) EXPECT() *MockQuizletImportWorkerPoolMockRecorder {
+	return m.recorder
+}
+
+// QueueWork mocks base method.
+func (m *MockQuizletImportWorkerPool) QueueWork(w *usecase.QuizletImportWork) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueueWork", w)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// QueueWork indicates an expected call of QueueWork.
+func (mr *MockQuizletImportWorkerPoolMockRecorder) QueueWork(w any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueueWork", reflect.TypeOf((*MockQuizletImportWorkerPool)(nil).QueueWork), w)
+}
+
+// MockCSVImportWorkerPool is a mock of CSVImportWorkerPool interface.
+type MockCSVImportWorkerPool struct {
+	ctrl     *gomock.Controller
+	recorder *MockCSVImportWorkerPoolMockRecorder
+	isgomock struct{}
+}
+
+// MockCSVImportWorkerPoolMockRecorder is the mock recorder for MockCSVImportWorkerPool.
+type MockCSVImportWorkerPoolMockRecorder struct {
+	mock *MockCSVImportWorkerPool
+}
+
+// NewMockCSVImportWorkerPool creates a new mock instance.
+func NewMockCSVImportWorkerPool(ctrl *gomock.Controller) *MockCSVImportWorkerPool {
+	mock := &MockCSVImportWorkerPool{ctrl: ctrl}
+	mock.recorder = &MockCSVImportWorkerPoolMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCSVImportWorkerPool) EXPECT() *MockCSVImportWorkerPoolMockRecorder {
+	return m.recorder
+}
+
+// QueueWork mocks base method.
+func (m *MockCSVImportWorkerPool) QueueWork(w *usecase.CSVImportWork) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueueWork", w)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// QueueWork indicates an expected call of QueueWork.
+func (mr *MockCSVImportWorkerPoolMockRecorder) QueueWork(w any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueueWork", reflect.TypeOf((*MockCSVImportWorkerPool)(nil).QueueWork), w)
 }

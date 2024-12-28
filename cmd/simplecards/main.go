@@ -15,8 +15,12 @@ import (
 	"github.com/llravell/simple-cards/pkg/workerpool"
 )
 
-const quizletImportWorkersAmount = 4
+const (
+	quizletImportWorkersAmount = 4
+	csvImportWorkersAmount     = 4
+)
 
+//nolint:funlen
 func main() {
 	cfg, err := config.NewConfig()
 	if err != nil {
@@ -46,6 +50,7 @@ func main() {
 
 	jwtManager := auth.NewJWTManager(cfg.JWTSecret)
 	quizletImportWorkerPool := workerpool.New[*usecase.QuizletImportWork](quizletImportWorkersAmount)
+	csvImportWorkerPool := workerpool.New[*usecase.CSVImportWork](csvImportWorkersAmount)
 
 	healthUseCase := usecase.NewHealthUseCase(db)
 	authUseCase := usecase.NewAuthUseCase(usersRepository, jwtManager)
@@ -54,17 +59,26 @@ func main() {
 		cardsRepository,
 		quizletParser,
 		quizletImportWorkerPool,
+		csvImportWorkerPool,
 		&logger,
 	)
 	cardsUseCase := usecase.NewCardsUseCase(cardsRepository)
 
 	quizletImportWorkerPool.ProcessQueue()
+	csvImportWorkerPool.ProcessQueue()
 
 	defer func() {
 		quizletImportWorkerPool.Close()
 
 		logger.Info().Msg("quizlet import worker pool closing...")
 		quizletImportWorkerPool.Wait()
+	}()
+
+	defer func() {
+		csvImportWorkerPool.Close()
+
+		logger.Info().Msg("csv import worker pool closing...")
+		csvImportWorkerPool.Wait()
 	}()
 
 	app.New(

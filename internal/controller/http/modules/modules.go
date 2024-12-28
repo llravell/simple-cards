@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
+	"path/filepath"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -14,6 +16,11 @@ import (
 	"github.com/rs/zerolog"
 )
 
+const (
+	maxCSVImportFileSize = 1 << 20
+	fileHeaderSize       = 1 << 20
+)
+
 type modulesUseCase interface {
 	GetAllModules(ctx context.Context, userUUID string) ([]*entity.Module, error)
 	GetModuleWithCards(ctx context.Context, userUUID string, moduleUUID string) (*entity.ModuleWithCards, error)
@@ -21,6 +28,7 @@ type modulesUseCase interface {
 	UpdateModule(ctx context.Context, userUUID string, moduleUUID string, moduleName string) (*entity.Module, error)
 	DeleteModule(ctx context.Context, userUUID string, moduleUUID string) error
 	QueueQuizletModuleImport(module *entity.Module, quizletModuleID string) error
+	QueueCSVModuleImport(module *entity.Module, reader io.ReadCloser) error
 }
 
 type createOrUpdateModuleRequest struct {
@@ -120,7 +128,7 @@ func (routes *Routes) createModule(w http.ResponseWriter, r *http.Request) {
 }
 
 // Swagger spec:
-// @Summary      Get module with cards
+// @Summary      Import module from quizlet public module
 // @Security     UsersAuth
 // @Tags         modules
 // @Accept       json
@@ -156,6 +164,49 @@ func (routes *Routes) importModuleFromQuizlet(w http.ResponseWriter, r *http.Req
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		routes.log.Error().Err(err).Msg("quizlet module import queue failed")
+
+		return
+	}
+}
+
+// Swagger spec:
+// @Summary      Import module from csv file
+// @Security     UsersAuth
+// @Tags         modules
+// @Accept       mpfd
+// @Param        file  formData  file  true  "CSV file with max size 1 MB"
+// @Success      200
+// @Failure      400
+// @Failure      500
+// @Router       /api/modules/import/csv [post]
+func (routes *Routes) importModuleFromCSV(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseMultipartForm(maxCSVImportFileSize)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		routes.log.Error().Err(err).Msg("parse multipart form failed")
+
+		return
+	}
+
+	r.Body = http.MaxBytesReader(w, r.Body, maxCSVImportFileSize)
+
+	file, multipartFileHeader, err := r.FormFile("file")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		routes.log.Error().Err(err).Msg("getting form file failed")
+
+		return
+	}
+
+	module := &entity.Module{
+		Name:     strings.TrimSuffix(multipartFileHeader.Filename, filepath.Ext(multipartFileHeader.Filename)),
+		UserUUID: middleware.GetUserUUIDFromRequest(r),
+	}
+
+	err = routes.modulesUC.QueueCSVModuleImport(module, file)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		routes.log.Error().Err(err).Msg("csv module import queue failed")
 
 		return
 	}
@@ -278,6 +329,7 @@ func (routes *Routes) Apply(r chi.Router) {
 
 		r.Route("/import", func(r chi.Router) {
 			r.Post("/quizlet", routes.importModuleFromQuizlet)
+			r.Post("/csv", routes.importModuleFromCSV)
 		})
 
 		r.Route("/{module_uuid}", func(r chi.Router) {

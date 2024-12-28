@@ -41,11 +41,15 @@ var testCard = entity.Card{
 }
 
 func prepareTestServer(
+	t *testing.T,
 	modulesRepo usecase.ModulesRepository,
 	cardsRepo usecase.CardsRepository,
 	quizletModuleParser usecase.QuizletModuleParser,
 	quizletImportWP usecase.QuizletImportWorkerPool,
+	csvImportWP usecase.CSVImportWorkerPool,
 ) *httptest.Server {
+	t.Helper()
+
 	log := zerolog.Nop()
 
 	modulesUseCase := usecase.NewModulesUseCase(
@@ -53,6 +57,7 @@ func prepareTestServer(
 		cardsRepo,
 		quizletModuleParser,
 		quizletImportWP,
+		csvImportWP,
 		&log,
 	)
 	router := chi.NewRouter()
@@ -68,8 +73,9 @@ func TestGetAllModules(t *testing.T) {
 	cardsRepo := mocks.NewMockCardsRepository(gomock.NewController(t))
 	quizletModuleParser := mocks.NewMockQuizletModuleParser(gomock.NewController(t))
 	quizletImportWP := mocks.NewMockQuizletImportWorkerPool(gomock.NewController(t))
+	csvImportWP := mocks.NewMockCSVImportWorkerPool(gomock.NewController(t))
 
-	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser, quizletImportWP)
+	ts := prepareTestServer(t, modulesRepo, cardsRepo, quizletModuleParser, quizletImportWP, csvImportWP)
 
 	defer ts.Close()
 
@@ -117,8 +123,9 @@ func TestCreateModule(t *testing.T) {
 	cardsRepo := mocks.NewMockCardsRepository(gomock.NewController(t))
 	quizletModuleParser := mocks.NewMockQuizletModuleParser(gomock.NewController(t))
 	quizletImportWP := mocks.NewMockQuizletImportWorkerPool(gomock.NewController(t))
+	csvImportWP := mocks.NewMockCSVImportWorkerPool(gomock.NewController(t))
 
-	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser, quizletImportWP)
+	ts := prepareTestServer(t, modulesRepo, cardsRepo, quizletModuleParser, quizletImportWP, csvImportWP)
 
 	defer ts.Close()
 
@@ -194,8 +201,9 @@ func TestUpdateModule(t *testing.T) {
 	cardsRepo := mocks.NewMockCardsRepository(gomock.NewController(t))
 	quizletModuleParser := mocks.NewMockQuizletModuleParser(gomock.NewController(t))
 	quizletImportWP := mocks.NewMockQuizletImportWorkerPool(gomock.NewController(t))
+	csvImportWP := mocks.NewMockCSVImportWorkerPool(gomock.NewController(t))
 
-	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser, quizletImportWP)
+	ts := prepareTestServer(t, modulesRepo, cardsRepo, quizletModuleParser, quizletImportWP, csvImportWP)
 
 	defer ts.Close()
 
@@ -273,8 +281,9 @@ func TestDeleteModule(t *testing.T) {
 	cardsRepo := mocks.NewMockCardsRepository(gomock.NewController(t))
 	quizletModuleParser := mocks.NewMockQuizletModuleParser(gomock.NewController(t))
 	quizletImportWP := mocks.NewMockQuizletImportWorkerPool(gomock.NewController(t))
+	csvImportWP := mocks.NewMockCSVImportWorkerPool(gomock.NewController(t))
 
-	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser, quizletImportWP)
+	ts := prepareTestServer(t, modulesRepo, cardsRepo, quizletModuleParser, quizletImportWP, csvImportWP)
 
 	defer ts.Close()
 
@@ -324,8 +333,9 @@ func TestGetModuleWithCards(t *testing.T) {
 	cardsRepo := mocks.NewMockCardsRepository(gomock.NewController(t))
 	quizletModuleParser := mocks.NewMockQuizletModuleParser(gomock.NewController(t))
 	quizletImportWP := mocks.NewMockQuizletImportWorkerPool(gomock.NewController(t))
+	csvImportWP := mocks.NewMockCSVImportWorkerPool(gomock.NewController(t))
 
-	ts := prepareTestServer(modulesRepo, cardsRepo, quizletModuleParser, quizletImportWP)
+	ts := prepareTestServer(t, modulesRepo, cardsRepo, quizletModuleParser, quizletImportWP, csvImportWP)
 
 	defer ts.Close()
 

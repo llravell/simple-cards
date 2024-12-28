@@ -331,6 +331,28 @@ paths:
       summary: Update card
       tags:
       - cards
+  /api/modules/import/csv:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: CSV file with max size 1 MB
+        in: formData
+        name: file
+        required: true
+        type: file
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - UsersAuth: []
+      summary: Import module from csv file
+      tags:
+      - modules
   /api/modules/import/quizlet:
     post:
       consumes:
@@ -347,9 +369,11 @@ paths:
           description: OK
         "400":
           description: Bad Request
+        "500":
+          description: Internal Server Error
       security:
       - UsersAuth: []
-      summary: Get module with cards
+      summary: Import module from quizlet public module
       tags:
       - modules
   /api/user/login:

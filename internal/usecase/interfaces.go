@@ -44,4 +44,12 @@ type (
 	QuizletModuleParser interface {
 		Parse(ctx context.Context, moduleID string) ([]quizlet.Card, error)
 	}
+
+	QuizletImportWorkerPool interface {
+		QueueWork(w *QuizletImportWork) error
+	}
+
+	CSVImportWorkerPool interface {
+		QueueWork(w *CSVImportWork) error
+	}
 )

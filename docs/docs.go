@@ -87,6 +87,42 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/modules/import/csv": {
+            "post": {
+                "security": [
+                    {
+                        "UsersAuth": []
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "modules"
+                ],
+                "summary": "Import module from csv file",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "CSV file with max size 1 MB",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/api/modules/import/quizlet": {
             "post": {
                 "security": [
@@ -100,7 +136,7 @@ const docTemplate = `{
                 "tags": [
                     "modules"
                 ],
-                "summary": "Get module with cards",
+                "summary": "Import module from quizlet public module",
                 "parameters": [
                     {
                         "description": "Import module params",
@@ -118,6 +154,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 }
             }
