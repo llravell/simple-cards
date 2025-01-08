@@ -1,7 +1,6 @@
 package cards
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -9,42 +8,23 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
+	httpCommon "github.com/llravell/simple-cards/internal/controller/http"
 	"github.com/llravell/simple-cards/internal/controller/http/middleware"
 	"github.com/llravell/simple-cards/internal/entity"
+	"github.com/llravell/simple-cards/internal/entity/dto"
 	"github.com/rs/zerolog"
 )
 
-type modulesUseCase interface {
-	ModuleExists(ctx context.Context, userUUID string, moduleUUID string) (bool, error)
-}
-
-type cardsUseCase interface {
-	GetModuleCards(ctx context.Context, moduleUUID string) ([]*entity.Card, error)
-	CreateCard(ctx context.Context, card *entity.Card) (*entity.Card, error)
-	SaveCard(ctx context.Context, card *entity.Card) (*entity.Card, error)
-	DeleteCard(ctx context.Context, moduleUUID string, cardUUID string) error
-}
-
-type createCardRequest struct {
-	Term    string `json:"term"    validate:"required"`
-	Meaning string `json:"meaning" validate:"required"`
-}
-
-type updateCardRequest struct {
-	Term    string `json:"term"    validate:"required_without=Meaning"`
-	Meaning string `json:"meaning" validate:"required_without=Term"`
-}
-
 type Routes struct {
 	log       zerolog.Logger
-	modulesUC modulesUseCase
-	cardsUC   cardsUseCase
+	modulesUC httpCommon.ModulesUseCase
+	cardsUC   httpCommon.CardsUseCase
 	validator *validator.Validate
 }
 
 func NewRoutes(
-	modulesUC modulesUseCase,
-	cardsUC cardsUseCase,
+	modulesUC httpCommon.ModulesUseCase,
+	cardsUC httpCommon.CardsUseCase,
 	log zerolog.Logger,
 ) *Routes {
 	return &Routes{
@@ -116,14 +96,14 @@ func (routes *Routes) getCards(w http.ResponseWriter, r *http.Request) {
 // @Accept       json
 // @Produce      json
 // @Param        module_uuid path string true "Module UUID"
-// @Param        request body createCardRequest true "Card params"
+// @Param        request body dto.CreateCardRequest true "Card params"
 // @Success      201  {object}  entity.Card
 // @Failure      400
 // @Failure      404
 // @Failure      500
 // @Router       /api/modules/{module_uuid}/cards/ [post]
 func (routes *Routes) addCard(w http.ResponseWriter, r *http.Request) {
-	var req createCardRequest
+	var req dto.CreateCardRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -164,7 +144,7 @@ func (routes *Routes) addCard(w http.ResponseWriter, r *http.Request) {
 // @Produce      json
 // @Param        module_uuid path string true "Module UUID"
 // @Param        card_uuid path string true "Card UUID"
-// @Param        request body updateCardRequest true "Card update params"
+// @Param        request body dto.UpdateCardRequest true "Card update params"
 // @Success      200  {object}  entity.Card
 // @Failure      400
 // @Failure      404
@@ -173,7 +153,7 @@ func (routes *Routes) addCard(w http.ResponseWriter, r *http.Request) {
 func (routes *Routes) updateCard(w http.ResponseWriter, r *http.Request) {
 	cardUUID := r.PathValue("card_uuid")
 
-	var req updateCardRequest
+	var req dto.UpdateCardRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)

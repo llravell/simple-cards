@@ -30,7 +30,7 @@ func (repo *CardsRepository) GetModuleCards(
 		WHERE module_uuid=$1;
 	`, moduleUUID)
 	if err != nil {
-		return cards, err
+		return nil, err
 	}
 
 	defer rows.Close()
@@ -40,7 +40,7 @@ func (repo *CardsRepository) GetModuleCards(
 
 		err = rows.Scan(&card.UUID, &card.Term, &card.Meaning, &card.ModuleUUID)
 		if err != nil {
-			return cards, err
+			return nil, err
 		}
 
 		cards = append(cards, &card)
@@ -51,7 +51,7 @@ func (repo *CardsRepository) GetModuleCards(
 			return cards, nil
 		}
 
-		return cards, err
+		return nil, err
 	}
 
 	return cards, nil
@@ -68,8 +68,11 @@ func (repo *CardsRepository) CreateCard(ctx context.Context, card *entity.Card) 
 	`, card.ModuleUUID, card.Term, card.Meaning)
 
 	err := row.Scan(&storedCard.UUID, &storedCard.ModuleUUID, &storedCard.Term, &storedCard.Meaning)
+	if err != nil {
+		return nil, err
+	}
 
-	return &storedCard, err
+	return &storedCard, nil
 }
 
 func (repo *CardsRepository) SaveCard(ctx context.Context, card *entity.Card) (*entity.Card, error) {
@@ -104,9 +107,13 @@ func (repo *CardsRepository) SaveCard(ctx context.Context, card *entity.Card) (*
 
 	args = append(args, card.UUID, card.ModuleUUID)
 	row := repo.conn.QueryRowContext(ctx, query, args...)
-	err := row.Scan(&storedCard.UUID, &storedCard.ModuleUUID, &storedCard.Term, &storedCard.Meaning)
 
-	return &storedCard, err
+	err := row.Scan(&storedCard.UUID, &storedCard.ModuleUUID, &storedCard.Term, &storedCard.Meaning)
+	if err != nil {
+		return nil, err
+	}
+
+	return &storedCard, nil
 }
 
 func (repo *CardsRepository) DeleteCard(ctx context.Context, moduleUUID string, cardUUID string) error {

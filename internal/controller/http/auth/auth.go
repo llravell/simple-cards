@@ -1,60 +1,66 @@
 package auth
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-playground/validator/v10"
+	httpCommon "github.com/llravell/simple-cards/internal/controller/http"
 	"github.com/llravell/simple-cards/internal/entity"
+	"github.com/llravell/simple-cards/internal/entity/dto"
 	"github.com/rs/zerolog"
 )
 
 const userTokenTTL = time.Hour * 3
 
-type authUseCase interface {
-	VerifyUser(ctx context.Context, login string, password string) (*entity.User, error)
-	BuildUserToken(user *entity.User, ttl time.Duration) (string, error)
-	RegisterUser(ctx context.Context, login string, password string) (*entity.User, error)
-}
-
-type authRequest struct {
-	Login    string `json:"login"`
-	Password string `json:"password"`
-}
-
-type authResponse struct {
-	Token string `json:"token"`
-}
-
 type Routes struct {
-	authUC authUseCase
-	log    zerolog.Logger
+	authUC    httpCommon.AuthUseCase
+	log       zerolog.Logger
+	validator *validator.Validate
 }
 
-func NewRoutes(authUC authUseCase, log zerolog.Logger) *Routes {
+func NewRoutes(authUC httpCommon.AuthUseCase, log zerolog.Logger) *Routes {
 	return &Routes{
-		authUC: authUC,
-		log:    log,
+		authUC:    authUC,
+		log:       log,
+		validator: validator.New(),
 	}
+}
+
+func (routes *Routes) parseAuthRequest(r *http.Request) (*dto.AuthRequest, error) {
+	var requestData dto.AuthRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&requestData); err != nil {
+		return nil, err
+	}
+
+	requestData.Login = strings.TrimSpace(requestData.Login)
+	requestData.Password = strings.TrimSpace(requestData.Password)
+
+	if err := routes.validator.Struct(requestData); err != nil {
+		return nil, err
+	}
+
+	return &requestData, nil
 }
 
 // Swagger spec:
 // @Summary      Register new user
 // @Tags         auth
 // @Accept       json
-// @Param        request body authRequest true "User creds"
-// @Success      200  {object}  authResponse
+// @Param        request body dto.AuthRequest true "User creds"
+// @Success      200  {object}  dto.AuthResponse
 // @Failure      400  "invalid data"
 // @Failure      409  "user with same login already exists"
 // @Failure      500  "token building error"
 // @Router       /api/user/register [post]
 func (routes *Routes) register(w http.ResponseWriter, r *http.Request) {
-	var requestData authRequest
-
-	if err := json.NewDecoder(r.Body).Decode(&requestData); err != nil {
+	requestData, err := routes.parseAuthRequest(r)
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 
 		return
@@ -81,7 +87,7 @@ func (routes *Routes) register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(authResponse{Token: token})
+	err = json.NewEncoder(w).Encode(dto.AuthResponse{Token: token})
 	if err != nil {
 		routes.log.Err(err).Msg("response write has been failed")
 	}
@@ -91,16 +97,15 @@ func (routes *Routes) register(w http.ResponseWriter, r *http.Request) {
 // @Summary      Verify user creds and login
 // @Tags         auth
 // @Accept       json
-// @Param        request body authRequest true "User creds"
-// @Success      200  {object}  authResponse
+// @Param        request body dto.AuthRequest true "User creds"
+// @Success      200  {object}  dto.AuthResponse
 // @Failure      400  "invalid data"
 // @Failure      401  "verification failed"
 // @Failure      500  "token building error"
 // @Router       /api/user/login [post]
 func (routes *Routes) login(w http.ResponseWriter, r *http.Request) {
-	var requestData authRequest
-
-	if err := json.NewDecoder(r.Body).Decode(&requestData); err != nil {
+	requestData, err := routes.parseAuthRequest(r)
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 
 		return
@@ -122,7 +127,7 @@ func (routes *Routes) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(authResponse{Token: token})
+	err = json.NewEncoder(w).Encode(dto.AuthResponse{Token: token})
 	if err != nil {
 		routes.log.Err(err).Msg("response write has been failed")
 	}

@@ -30,7 +30,7 @@ func (repo *ModulesRepository) GetAllModules(
 		userUUID,
 	)
 	if err != nil {
-		return modules, err
+		return nil, err
 	}
 
 	defer rows.Close()
@@ -40,7 +40,7 @@ func (repo *ModulesRepository) GetAllModules(
 
 		err = rows.Scan(&module.UUID, &module.Name, &module.UserUUID)
 		if err != nil {
-			return modules, err
+			return nil, err
 		}
 
 		modules = append(modules, &module)
@@ -51,7 +51,7 @@ func (repo *ModulesRepository) GetAllModules(
 			return modules, nil
 		}
 
-		return modules, err
+		return nil, err
 	}
 
 	return modules, nil

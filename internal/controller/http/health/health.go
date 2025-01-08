@@ -1,23 +1,19 @@
 package health
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	httpCommon "github.com/llravell/simple-cards/internal/controller/http"
 	"github.com/rs/zerolog"
 )
 
-type healthUseCase interface {
-	PingContext(ctx context.Context) error
-}
-
 type Routes struct {
-	healthUC healthUseCase
+	healthUC httpCommon.HealthUseCase
 	log      zerolog.Logger
 }
 
-func NewRoutes(healthUC healthUseCase, log zerolog.Logger) *Routes {
+func NewRoutes(healthUC httpCommon.HealthUseCase, log zerolog.Logger) *Routes {
 	return &Routes{
 		healthUC: healthUC,
 		log:      log,

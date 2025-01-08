@@ -1,51 +1,32 @@
 package modules
 
 import (
-	"context"
 	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"path/filepath"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
+	httpCommon "github.com/llravell/simple-cards/internal/controller/http"
 	"github.com/llravell/simple-cards/internal/controller/http/middleware"
 	"github.com/llravell/simple-cards/internal/entity"
+	"github.com/llravell/simple-cards/internal/entity/dto"
 	"github.com/rs/zerolog"
 )
 
 const maxCSVImportFileSize = 1 << 20
 
-type modulesUseCase interface {
-	GetAllModules(ctx context.Context, userUUID string) ([]*entity.Module, error)
-	GetModuleWithCards(ctx context.Context, userUUID string, moduleUUID string) (*entity.ModuleWithCards, error)
-	CreateNewModule(ctx context.Context, userUUID string, moduleName string) (*entity.Module, error)
-	UpdateModule(ctx context.Context, userUUID string, moduleUUID string, moduleName string) (*entity.Module, error)
-	DeleteModule(ctx context.Context, userUUID string, moduleUUID string) error
-	QueueQuizletModuleImport(module *entity.Module, quizletModuleID string) error
-	QueueCSVModuleImport(module *entity.Module, reader io.ReadCloser) error
-}
-
-type createOrUpdateModuleRequest struct {
-	Name string `json:"name" validate:"required,max=100"`
-}
-
-type quizletImportRequest struct {
-	ModuleName      string `json:"module_name"       validate:"required,max=100"`
-	QuizletModuleID string `json:"quizlet_module_id" validate:"required"`
-}
-
 type Routes struct {
 	log       zerolog.Logger
-	modulesUC modulesUseCase
+	modulesUC httpCommon.ModulesUseCase
 	validator *validator.Validate
 }
 
-func NewRoutes(modulesUC modulesUseCase, log zerolog.Logger) *Routes {
+func NewRoutes(modulesUC httpCommon.ModulesUseCase, log zerolog.Logger) *Routes {
 	return &Routes{
 		log:       log,
 		modulesUC: modulesUC,
@@ -88,13 +69,13 @@ func (routes *Routes) getAllModules(w http.ResponseWriter, r *http.Request) {
 // @Tags         modules
 // @Accept       json
 // @Produce      json
-// @Param        request body createOrUpdateModuleRequest true "Module params"
+// @Param        request body dto.CreateOrUpdateModuleRequest true "Module params"
 // @Success      201  {object}  entity.Module
 // @Failure      400
 // @Failure      500
 // @Router       /api/modules/ [post]
 func (routes *Routes) createModule(w http.ResponseWriter, r *http.Request) {
-	var req createOrUpdateModuleRequest
+	var req dto.CreateOrUpdateModuleRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -131,13 +112,13 @@ func (routes *Routes) createModule(w http.ResponseWriter, r *http.Request) {
 // @Security     UsersAuth
 // @Tags         modules
 // @Accept       json
-// @Param        request body quizletImportRequest true "Import module params"
+// @Param        request body dto.QuizletImportRequest true "Import module params"
 // @Success      200
 // @Failure      400
 // @Failure      500
 // @Router       /api/modules/import/quizlet [post]
 func (routes *Routes) importModuleFromQuizlet(w http.ResponseWriter, r *http.Request) {
-	var req quizletImportRequest
+	var req dto.QuizletImportRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -218,14 +199,14 @@ func (routes *Routes) importModuleFromCSV(w http.ResponseWriter, r *http.Request
 // @Accept       json
 // @Produce      json
 // @Param        module_uuid path string true "Module UUID"
-// @Param        request body createOrUpdateModuleRequest true "Module params"
+// @Param        request body dto.CreateOrUpdateModuleRequest true "Module params"
 // @Success      200  {object}  entity.Module
 // @Failure      400
 // @Failure      404
 // @Failure      500
 // @Router       /api/modules/{module_uuid}/ [put]
 func (routes *Routes) updateModule(w http.ResponseWriter, r *http.Request) {
-	var req createOrUpdateModuleRequest
+	var req dto.CreateOrUpdateModuleRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)

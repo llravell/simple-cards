@@ -40,7 +40,11 @@ func (r *UsersRepository) StoreUser(
 		}
 	}
 
-	return &user, err
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
 
 func (r *UsersRepository) FindUserByLogin(ctx context.Context, login string) (*entity.User, error) {
@@ -54,6 +58,9 @@ func (r *UsersRepository) FindUserByLogin(ctx context.Context, login string) (*e
 	`, login)
 
 	err := row.Scan(&user.UUID, &user.Login, &user.Password)
+	if err != nil {
+		return nil, err
+	}
 
-	return &user, err
+	return &user, nil
 }

@@ -9,12 +9,12 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	_ "github.com/llravell/simple-cards/docs" //nolint:blank-imports
+	httpCommon "github.com/llravell/simple-cards/internal/controller/http"
 	"github.com/llravell/simple-cards/internal/controller/http/auth"
 	"github.com/llravell/simple-cards/internal/controller/http/cards"
 	"github.com/llravell/simple-cards/internal/controller/http/health"
 	"github.com/llravell/simple-cards/internal/controller/http/middleware"
 	"github.com/llravell/simple-cards/internal/controller/http/modules"
-	"github.com/llravell/simple-cards/internal/usecase"
 	"github.com/rs/zerolog"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
@@ -33,10 +33,10 @@ func startServer(addr string, handler http.Handler) error {
 type Option func(app *App)
 
 type App struct {
-	healthUseCase  *usecase.HealthUseCase
-	authUseCase    *usecase.AuthUseCase
-	modulesUseCase *usecase.ModulesUseCase
-	cardsUseCase   *usecase.CardsUseCase
+	healthUseCase  httpCommon.HealthUseCase
+	authUseCase    httpCommon.AuthUseCase
+	modulesUseCase httpCommon.ModulesUseCase
+	cardsUseCase   httpCommon.CardsUseCase
 	jwtParser      middleware.JWTParser
 	router         chi.Router
 	log            zerolog.Logger
@@ -50,10 +50,10 @@ func Addr(addr string) Option {
 }
 
 func New(
-	healthUseCase *usecase.HealthUseCase,
-	authUseCase *usecase.AuthUseCase,
-	modulesUseCase *usecase.ModulesUseCase,
-	cardsUseCase *usecase.CardsUseCase,
+	healthUseCase httpCommon.HealthUseCase,
+	authUseCase httpCommon.AuthUseCase,
+	modulesUseCase httpCommon.ModulesUseCase,
+	cardsUseCase httpCommon.CardsUseCase,
 	jwtParser middleware.JWTParser,
 	log zerolog.Logger,
 	opts ...Option,
@@ -72,19 +72,12 @@ func New(
 		opt(app)
 	}
 
+	app.setupRoutes()
+
 	return app
 }
 
-// Swagger spec:
-// @title       Simple Cards API
-// @version     1.0
-// @host        localhost:8080
-// @BasePath    /
-
-// @securityDefinitions.apikey UsersAuth
-// @in header
-// @name Authorization
-func (app *App) Run() {
+func (app *App) setupRoutes() {
 	healthRoutes := health.NewRoutes(app.healthUseCase, app.log)
 	authRoutes := auth.NewRoutes(app.authUseCase, app.log)
 	modulesRoutes := modules.NewRoutes(app.modulesUseCase, app.log)
@@ -102,7 +95,18 @@ func (app *App) Run() {
 	})
 
 	app.router.Get("/swagger/*", httpSwagger.Handler())
+}
 
+// Swagger spec:
+// @title       Simple Cards API
+// @version     1.0
+// @host        localhost:8080
+// @BasePath    /
+
+// @securityDefinitions.apikey UsersAuth
+// @in header
+// @name Authorization
+func (app *App) Run() {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 
