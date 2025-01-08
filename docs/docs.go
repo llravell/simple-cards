@@ -67,7 +67,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/modules.createOrUpdateModuleRequest"
+                            "$ref": "#/definitions/dto.CreateOrUpdateModuleRequest"
                         }
                     }
                 ],
@@ -144,7 +144,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/modules.quizletImportRequest"
+                            "$ref": "#/definitions/dto.QuizletImportRequest"
                         }
                     }
                 ],
@@ -229,7 +229,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/modules.createOrUpdateModuleRequest"
+                            "$ref": "#/definitions/dto.CreateOrUpdateModuleRequest"
                         }
                     }
                 ],
@@ -354,7 +354,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/cards.createCardRequest"
+                            "$ref": "#/definitions/dto.CreateCardRequest"
                         }
                     }
                 ],
@@ -415,7 +415,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/cards.updateCardRequest"
+                            "$ref": "#/definitions/dto.UpdateCardRequest"
                         }
                     }
                 ],
@@ -531,7 +531,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.authRequest"
+                            "$ref": "#/definitions/dto.AuthRequest"
                         }
                     }
                 ],
@@ -539,7 +539,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/auth.authResponse"
+                            "$ref": "#/definitions/dto.AuthResponse"
                         }
                     },
                     "400": {
@@ -570,7 +570,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.authRequest"
+                            "$ref": "#/definitions/dto.AuthRequest"
                         }
                     }
                 ],
@@ -578,7 +578,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/auth.authResponse"
+                            "$ref": "#/definitions/dto.AuthResponse"
                         }
                     },
                     "400": {
@@ -611,8 +611,12 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "auth.authRequest": {
+        "dto.AuthRequest": {
             "type": "object",
+            "required": [
+                "login",
+                "password"
+            ],
             "properties": {
                 "login": {
                     "type": "string"
@@ -622,7 +626,7 @@ const docTemplate = `{
                 }
             }
         },
-        "auth.authResponse": {
+        "dto.AuthResponse": {
             "type": "object",
             "properties": {
                 "token": {
@@ -630,7 +634,7 @@ const docTemplate = `{
                 }
             }
         },
-        "cards.createCardRequest": {
+        "dto.CreateCardRequest": {
             "type": "object",
             "required": [
                 "meaning",
@@ -645,7 +649,35 @@ const docTemplate = `{
                 }
             }
         },
-        "cards.updateCardRequest": {
+        "dto.CreateOrUpdateModuleRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "maxLength": 100
+                }
+            }
+        },
+        "dto.QuizletImportRequest": {
+            "type": "object",
+            "required": [
+                "module_name",
+                "quizlet_module_id"
+            ],
+            "properties": {
+                "module_name": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "quizlet_module_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UpdateCardRequest": {
             "type": "object",
             "properties": {
                 "meaning": {
@@ -703,34 +735,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "modules.createOrUpdateModuleRequest": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "name": {
-                    "type": "string",
-                    "maxLength": 100
-                }
-            }
-        },
-        "modules.quizletImportRequest": {
-            "type": "object",
-            "required": [
-                "module_name",
-                "quizlet_module_id"
-            ],
-            "properties": {
-                "module_name": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "quizlet_module_id": {
                     "type": "string"
                 }
             }

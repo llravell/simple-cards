@@ -60,7 +60,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/modules.createOrUpdateModuleRequest"
+                            "$ref": "#/definitions/dto.CreateOrUpdateModuleRequest"
                         }
                     }
                 ],
@@ -137,7 +137,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/modules.quizletImportRequest"
+                            "$ref": "#/definitions/dto.QuizletImportRequest"
                         }
                     }
                 ],
@@ -222,7 +222,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/modules.createOrUpdateModuleRequest"
+                            "$ref": "#/definitions/dto.CreateOrUpdateModuleRequest"
                         }
                     }
                 ],
@@ -347,7 +347,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/cards.createCardRequest"
+                            "$ref": "#/definitions/dto.CreateCardRequest"
                         }
                     }
                 ],
@@ -408,7 +408,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/cards.updateCardRequest"
+                            "$ref": "#/definitions/dto.UpdateCardRequest"
                         }
                     }
                 ],
@@ -524,7 +524,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.authRequest"
+                            "$ref": "#/definitions/dto.AuthRequest"
                         }
                     }
                 ],
@@ -532,7 +532,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/auth.authResponse"
+                            "$ref": "#/definitions/dto.AuthResponse"
                         }
                     },
                     "400": {
@@ -563,7 +563,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.authRequest"
+                            "$ref": "#/definitions/dto.AuthRequest"
                         }
                     }
                 ],
@@ -571,7 +571,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/auth.authResponse"
+                            "$ref": "#/definitions/dto.AuthResponse"
                         }
                     },
                     "400": {
@@ -604,8 +604,12 @@
         }
     },
     "definitions": {
-        "auth.authRequest": {
+        "dto.AuthRequest": {
             "type": "object",
+            "required": [
+                "login",
+                "password"
+            ],
             "properties": {
                 "login": {
                     "type": "string"
@@ -615,7 +619,7 @@
                 }
             }
         },
-        "auth.authResponse": {
+        "dto.AuthResponse": {
             "type": "object",
             "properties": {
                 "token": {
@@ -623,7 +627,7 @@
                 }
             }
         },
-        "cards.createCardRequest": {
+        "dto.CreateCardRequest": {
             "type": "object",
             "required": [
                 "meaning",
@@ -638,7 +642,35 @@
                 }
             }
         },
-        "cards.updateCardRequest": {
+        "dto.CreateOrUpdateModuleRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "maxLength": 100
+                }
+            }
+        },
+        "dto.QuizletImportRequest": {
+            "type": "object",
+            "required": [
+                "module_name",
+                "quizlet_module_id"
+            ],
+            "properties": {
+                "module_name": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "quizlet_module_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UpdateCardRequest": {
             "type": "object",
             "properties": {
                 "meaning": {
@@ -696,34 +728,6 @@
                     "type": "string"
                 },
                 "uuid": {
-                    "type": "string"
-                }
-            }
-        },
-        "modules.createOrUpdateModuleRequest": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "name": {
-                    "type": "string",
-                    "maxLength": 100
-                }
-            }
-        },
-        "modules.quizletImportRequest": {
-            "type": "object",
-            "required": [
-                "module_name",
-                "quizlet_module_id"
-            ],
-            "properties": {
-                "module_name": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "quizlet_module_id": {
                     "type": "string"
                 }
             }

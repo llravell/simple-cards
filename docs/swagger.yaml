@@ -1,18 +1,21 @@
 basePath: /
 definitions:
-  auth.authRequest:
+  dto.AuthRequest:
     properties:
       login:
         type: string
       password:
         type: string
+    required:
+    - login
+    - password
     type: object
-  auth.authResponse:
+  dto.AuthResponse:
     properties:
       token:
         type: string
     type: object
-  cards.createCardRequest:
+  dto.CreateCardRequest:
     properties:
       meaning:
         type: string
@@ -22,7 +25,26 @@ definitions:
     - meaning
     - term
     type: object
-  cards.updateCardRequest:
+  dto.CreateOrUpdateModuleRequest:
+    properties:
+      name:
+        maxLength: 100
+        type: string
+    required:
+    - name
+    type: object
+  dto.QuizletImportRequest:
+    properties:
+      module_name:
+        maxLength: 100
+        type: string
+      quizlet_module_id:
+        type: string
+    required:
+    - module_name
+    - quizlet_module_id
+    type: object
+  dto.UpdateCardRequest:
     properties:
       meaning:
         type: string
@@ -62,25 +84,6 @@ definitions:
       uuid:
         type: string
     type: object
-  modules.createOrUpdateModuleRequest:
-    properties:
-      name:
-        maxLength: 100
-        type: string
-    required:
-    - name
-    type: object
-  modules.quizletImportRequest:
-    properties:
-      module_name:
-        maxLength: 100
-        type: string
-      quizlet_module_id:
-        type: string
-    required:
-    - module_name
-    - quizlet_module_id
-    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -114,7 +117,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/modules.createOrUpdateModuleRequest'
+          $ref: '#/definitions/dto.CreateOrUpdateModuleRequest'
       produces:
       - application/json
       responses:
@@ -186,7 +189,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/modules.createOrUpdateModuleRequest'
+          $ref: '#/definitions/dto.CreateOrUpdateModuleRequest'
       produces:
       - application/json
       responses:
@@ -247,7 +250,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/cards.createCardRequest'
+          $ref: '#/definitions/dto.CreateCardRequest'
       produces:
       - application/json
       responses:
@@ -312,7 +315,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/cards.updateCardRequest'
+          $ref: '#/definitions/dto.UpdateCardRequest'
       produces:
       - application/json
       responses:
@@ -385,7 +388,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/modules.quizletImportRequest'
+          $ref: '#/definitions/dto.QuizletImportRequest'
       responses:
         "200":
           description: OK
@@ -408,12 +411,12 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/auth.authRequest'
+          $ref: '#/definitions/dto.AuthRequest'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/auth.authResponse'
+            $ref: '#/definitions/dto.AuthResponse'
         "400":
           description: invalid data
         "401":
@@ -433,12 +436,12 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/auth.authRequest'
+          $ref: '#/definitions/dto.AuthRequest'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/auth.authResponse'
+            $ref: '#/definitions/dto.AuthResponse'
         "400":
           description: invalid data
         "409":
