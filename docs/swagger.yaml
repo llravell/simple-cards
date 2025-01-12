@@ -1,0 +1,469 @@
+basePath: /
+definitions:
+  dto.AuthRequest:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  dto.AuthResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  dto.CreateCardRequest:
+    properties:
+      meaning:
+        type: string
+      term:
+        type: string
+    required:
+    - meaning
+    - term
+    type: object
+  dto.CreateOrUpdateModuleRequest:
+    properties:
+      name:
+        maxLength: 100
+        type: string
+    required:
+    - name
+    type: object
+  dto.QuizletImportRequest:
+    properties:
+      module_name:
+        maxLength: 100
+        type: string
+      quizlet_module_id:
+        type: string
+    required:
+    - module_name
+    - quizlet_module_id
+    type: object
+  dto.UpdateCardRequest:
+    properties:
+      meaning:
+        type: string
+      term:
+        type: string
+    type: object
+  entity.Card:
+    properties:
+      meaning:
+        type: string
+      module_uuid:
+        type: string
+      term:
+        type: string
+      uuid:
+        type: string
+    type: object
+  entity.Module:
+    properties:
+      name:
+        type: string
+      user_uuid:
+        type: string
+      uuid:
+        type: string
+    type: object
+  entity.ModuleWithCards:
+    properties:
+      cards:
+        items:
+          $ref: '#/definitions/entity.Card'
+        type: array
+      name:
+        type: string
+      user_uuid:
+        type: string
+      uuid:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  title: Simple Cards API
+  version: "1.0"
+paths:
+  /api/modules/:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Module'
+            type: array
+        "500":
+          description: Internal Server Error
+      security:
+      - UsersAuth: []
+      summary: Get all user's modules
+      tags:
+      - modules
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Module params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateOrUpdateModuleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Module'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - UsersAuth: []
+      summary: Create new module
+      tags:
+      - modules
+  /api/modules/{module_uuid}/:
+    delete:
+      parameters:
+      - description: Module UUID
+        in: path
+        name: module_uuid
+        required: true
+        type: string
+      responses:
+        "202":
+          description: Accepted
+        "500":
+          description: Internal Server Error
+      security:
+      - UsersAuth: []
+      summary: Delete module
+      tags:
+      - modules
+    get:
+      parameters:
+      - description: Module UUID
+        in: path
+        name: module_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.ModuleWithCards'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - UsersAuth: []
+      summary: Get module with cards
+      tags:
+      - modules
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Module UUID
+        in: path
+        name: module_uuid
+        required: true
+        type: string
+      - description: Module params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateOrUpdateModuleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Module'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - UsersAuth: []
+      summary: Update module
+      tags:
+      - modules
+  /api/modules/{module_uuid}/cards/:
+    get:
+      parameters:
+      - description: Module UUID
+        in: path
+        name: module_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Card'
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - UsersAuth: []
+      summary: Get all module's cards
+      tags:
+      - cards
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Module UUID
+        in: path
+        name: module_uuid
+        required: true
+        type: string
+      - description: Card params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateCardRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Card'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - UsersAuth: []
+      summary: Add new card to module
+      tags:
+      - cards
+  /api/modules/{module_uuid}/cards/{card_uuid}:
+    delete:
+      parameters:
+      - description: Module UUID
+        in: path
+        name: module_uuid
+        required: true
+        type: string
+      - description: Card UUID
+        in: path
+        name: card_uuid
+        required: true
+        type: string
+      responses:
+        "202":
+          description: Accepted
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - UsersAuth: []
+      summary: Delete card
+      tags:
+      - cards
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Module UUID
+        in: path
+        name: module_uuid
+        required: true
+        type: string
+      - description: Card UUID
+        in: path
+        name: card_uuid
+        required: true
+        type: string
+      - description: Card update params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateCardRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Card'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - UsersAuth: []
+      summary: Update card
+      tags:
+      - cards
+  /api/modules/{module_uuid}/export/csv:
+    get:
+      parameters:
+      - description: Module UUID
+        in: path
+        name: module_uuid
+        required: true
+        type: string
+      produces:
+      - text/csv
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - UsersAuth: []
+      summary: Export module to csv file
+      tags:
+      - modules
+  /api/modules/import/csv:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: CSV file with max size 1 MB
+        in: formData
+        name: file
+        required: true
+        type: file
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - UsersAuth: []
+      summary: Import module from csv file
+      tags:
+      - modules
+  /api/modules/import/quizlet:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Import module params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.QuizletImportRequest'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - UsersAuth: []
+      summary: Import module from quizlet public module
+      tags:
+      - modules
+  /api/user/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User creds
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AuthRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AuthResponse'
+        "400":
+          description: invalid data
+        "401":
+          description: verification failed
+        "500":
+          description: token building error
+      summary: Verify user creds and login
+      tags:
+      - auth
+  /api/user/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User creds
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AuthRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AuthResponse'
+        "400":
+          description: invalid data
+        "409":
+          description: user with same login already exists
+        "500":
+          description: token building error
+      summary: Register new user
+      tags:
+      - auth
+  /ping:
+    get:
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+      summary: Check database connection
+      tags:
+      - health
+securityDefinitions:
+  UsersAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

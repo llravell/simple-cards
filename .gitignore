@@ -8,12 +8,16 @@
 # Test binary, built with `go test -c`
 *.test
 
+# Local files
+*.env
+
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
 # Binaries
 cmd/gophermart/main
 cmd/gophermart/gophermart
+bin
 
 # Dependency directories (remove the comment below to include it)
 vendor/
